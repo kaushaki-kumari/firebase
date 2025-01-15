@@ -1,15 +1,14 @@
-import { Text, View } from "react-native";
+import React from "react";
+import { Provider } from "react-redux";
+import store from "./store";
+import AppNavigator from "./components/AppNavigator";
 
-export default function Index() {
+const Index = () => {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+    <Provider store={store}>
+      <AppNavigator />
+    </Provider>
   );
-}
+};
+
+export default Index;
