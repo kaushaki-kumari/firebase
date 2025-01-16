@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import SuccessMessageModal from "../modal/SuccessMessageModal";
 import {
   View,
   Text,
@@ -73,7 +74,7 @@ const Register = () => {
       image: "",
     });
   };
-
+  const [isModalVisible, setModalVisible] = useState(false);
   useEffect(() => {
     const resetFormField = navigation.addListener("focus", () => {
       resetForm();
@@ -199,8 +200,7 @@ const Register = () => {
       );
 
       if (registerUser.fulfilled.match(result)) {
-        alert("User registered successfully");
-        navigation.navigate("Login");
+        setModalVisible(true);
       } else {
         console.error("Registration failed:", result);
       }
@@ -209,6 +209,10 @@ const Register = () => {
     }
   };
 
+  const handleModalClose = () => {
+    setModalVisible(false);
+    navigation.navigate("Login");
+  };
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -219,6 +223,10 @@ const Register = () => {
 
     if (!result.canceled) {
       dispatch(setUserData({ image: result.assets[0].uri }));
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        image: "",
+      }));
     } else {
       dispatch(setErrorMessage("No image selected. Please select an image."));
     }
@@ -227,7 +235,6 @@ const Register = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Register Now – Start Your Journey</Text>
-      <Text style={styles.subTitle}>Register</Text>
       <TextInput
         placeholder="First Name"
         value={firstName}
@@ -332,10 +339,15 @@ const Register = () => {
       </TouchableOpacity>
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
+      <SuccessMessageModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        message="User registered successfully!"
+      />
     </ScrollView>
   );
 };
@@ -349,13 +361,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "700",
-    color: "#2d3748",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  subTitle: {
-    fontSize: 20,
-    fontWeight: "600",
     color: "#2d3748",
     marginBottom: 10,
     textAlign: "center",

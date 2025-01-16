@@ -1,27 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser } from "./userActions";
 
-const initialState = {
-  firstName: "",
-  lastName: "",
-  mobileNo: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  image: null as string | null,
-  errorMessage: null as string | null,
-  loading: false,
-  status: "idle" as "idle" | "loading" | "succeeded" | "failed",
-};
+type UserState = Record<string, any>;
 
+const initialState: UserState = {};
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUserData: (
-      state,
-      action: PayloadAction<Partial<typeof initialState>>
-    ) => {
+    setUserData: (state, action: PayloadAction<UserState>) => {
       return { ...state, ...action.payload };
     },
     setLoading: (state, action: PayloadAction<boolean>) => {
@@ -31,7 +18,7 @@ const userSlice = createSlice({
       state.errorMessage = action.payload;
     },
     resetUserState: () => {
-      return initialState;
+      return {}; 
     },
   },
   extraReducers: (builder) => {
@@ -41,15 +28,8 @@ const userSlice = createSlice({
         state.loading = true;
         state.errorMessage = null;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<any>) => {
-        state.status = "succeeded";
-        state.loading = false;
-        state.errorMessage = null;
-        state.firstName = action.payload.firstName;
-        state.lastName = action.payload.lastName;
-        state.mobileNo = action.payload.mobileNo;
-        state.email = action.payload.email;
-        state.image = action.payload.profilePhoto;
+      .addCase(registerUser.fulfilled, (state, action: PayloadAction<UserState>) => {
+        return { ...state, ...action.payload, status: "succeeded", loading: false, errorMessage: null };
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.status = "failed";
@@ -59,6 +39,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUserData, setLoading, setErrorMessage, resetUserState } =
-  userSlice.actions;
+export const { setUserData, setLoading, setErrorMessage, resetUserState } = userSlice.actions;
 export default userSlice.reducer;
