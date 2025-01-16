@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { createUserWithEmailAndPassword, AuthError, AuthErrorCodes, UserCredential } from "firebase/auth";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, doc, collection } from "firebase/firestore";
 import { auth, db } from "../config/firbase.config"; 
 
 interface RegisterUserPayload {
@@ -21,7 +21,9 @@ export const registerUser = createAsyncThunk(
         userData.email,
         userData.password
       );
-      await setDoc(doc(db, "users", userCredential.user.uid), {
+      const userRef = doc(collection(db, "users"));
+      await setDoc(userRef, {
+        uid: userCredential.user.uid,  
         firstName: userData.firstName,
         lastName: userData.lastName,
         mobileNo: userData.mobileNo,

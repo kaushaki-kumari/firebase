@@ -11,12 +11,14 @@ interface SuccessMessageModalProps {
   visible: boolean;
   onClose: () => void;
   message: string;
+  text:string;
 }
 
 const SuccessMessageModal: React.FC<SuccessMessageModalProps> = ({
   visible,
   onClose,
   message,
+  text,
 }) => {
   return (
     <Modal
@@ -29,7 +31,7 @@ const SuccessMessageModal: React.FC<SuccessMessageModalProps> = ({
         <View style={styles.modalContainer}>
           <Text style={styles.message}>{message}</Text>
           <TouchableOpacity onPress={onClose} style={styles.button}>
-            <Text style={styles.buttonText}>Go to Login</Text>
+            <Text style={styles.buttonText}>{text}</Text>
           </TouchableOpacity>
         </View>
       </View>

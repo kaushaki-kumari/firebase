@@ -15,16 +15,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { AppDispatch } from "../store/index";
 import { registerUser } from "../reducer/userActions";
 import * as ImagePicker from "expo-image-picker";
-import {
-  setUserData,
-  setLoading,
-  setErrorMessage,
-  resetUserState,
-} from "../reducer/userSlice";
+import {  setErrorMessage } from "../reducer/userSlice";
 import { RootState } from "../store";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
+import PasswordInput from "../components/PasswordInput";
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
@@ -39,17 +34,16 @@ const Register = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const user = useSelector((state: RootState) => state.user);
-  const {
-    firstName,
-    lastName,
-    mobileNo,
-    email,
-    password,
-    confirmPassword,
-    errorMessage,
-    loading,
-    image,
-  } = user;
+  const { errorMessage, loading } = user;
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    mobileNo: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    image: "",
+  });
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -59,11 +53,16 @@ const Register = () => {
     confirmPassword: "",
     image: "",
   });
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
-    useState(false);
   const resetForm = () => {
-    dispatch(resetUserState());
+    setForm({
+      firstName: "",
+      lastName: "",
+      mobileNo: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      image: "",
+    });
     setErrors({
       firstName: "",
       lastName: "",
@@ -74,40 +73,15 @@ const Register = () => {
       image: "",
     });
   };
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isSuccessMessageModalVisible, setSuccessMessageModalVisible] = useState(false);
   useEffect(() => {
     const resetFormField = navigation.addListener("focus", () => {
       resetForm();
+      dispatch(setErrorMessage(null));
     });
 
     return resetFormField;
   }, [navigation]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(
-        setUserData({
-          firstName: "",
-          lastName: "",
-          mobileNo: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        })
-      );
-      dispatch(setErrorMessage(null));
-      dispatch(setLoading(false));
-      setErrors({
-        firstName: "",
-        lastName: "",
-        mobileNo: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        image: "",
-      });
-    };
-  }, [dispatch]);
 
   const validateField = (field: string, value: string) => {
     let error = "";
@@ -145,7 +119,7 @@ const Register = () => {
       }
     }
     if (field === "confirmPassword") {
-      if (val !== password) error = "Passwords do not match.";
+      if (val !== form.password) error = "Passwords do not match.";
     }
     if (field === "image") {
       if (!val.trim()) error = "Profile image is required.";
@@ -154,7 +128,7 @@ const Register = () => {
   };
 
   const handleInputChange = (field: string, value: string) => {
-    dispatch(setUserData({ [field]: value }));
+    setForm({ ...form, [field]: value });
     const error = validateField(field, value);
     setErrors((prevErrors) => ({
       ...prevErrors,
@@ -177,7 +151,7 @@ const Register = () => {
     ];
 
     fields.forEach((field) => {
-      const value = user[field as keyof typeof user] as string;
+      const value = form[field as keyof typeof form] as string;
       const error = validateField(field, value);
       newErrors[field] = error;
       if (error) formIsValid = false;
@@ -190,17 +164,19 @@ const Register = () => {
     try {
       const result = await (dispatch as AppDispatch)(
         registerUser({
-          firstName,
-          lastName,
-          mobileNo,
-          email,
-          password,
-          confirmPassword,
+          firstName: form.firstName,
+          lastName: form.lastName,
+          mobileNo: form.mobileNo,
+          email: form.email,
+          password: form.password,
+          confirmPassword: form.confirmPassword,
         })
       );
 
       if (registerUser.fulfilled.match(result)) {
-        setModalVisible(true);
+        resetForm();
+        setSuccessMessageModalVisible(true);
+
       } else {
         console.error("Registration failed:", result);
       }
@@ -210,7 +186,7 @@ const Register = () => {
   };
 
   const handleModalClose = () => {
-    setModalVisible(false);
+    setSuccessMessageModalVisible(false);
     navigation.navigate("Login");
   };
   const pickImage = async () => {
@@ -222,7 +198,7 @@ const Register = () => {
     });
 
     if (!result.canceled) {
-      dispatch(setUserData({ image: result.assets[0].uri }));
+      setForm({ ...form, image: result.assets[0].uri });
       setErrors((prevErrors) => ({
         ...prevErrors,
         image: "",
@@ -237,7 +213,7 @@ const Register = () => {
       <Text style={styles.title}>Register Now – Start Your Journey</Text>
       <TextInput
         placeholder="First Name"
-        value={firstName}
+        value={form.firstName}
         onChangeText={(text) => handleInputChange("firstName", text)}
         style={styles.input}
       />
@@ -247,7 +223,7 @@ const Register = () => {
 
       <TextInput
         placeholder="Last Name"
-        value={lastName}
+        value={form.lastName}
         onChangeText={(text) => handleInputChange("lastName", text)}
         style={styles.input}
       />
@@ -256,7 +232,7 @@ const Register = () => {
       )}
       <TextInput
         placeholder="Mobile Number"
-        value={mobileNo}
+        value={form.mobileNo}
         onChangeText={(text) => handleInputChange("mobileNo", text)}
         keyboardType="phone-pad"
         style={styles.input}
@@ -266,63 +242,33 @@ const Register = () => {
       )}
       <TextInput
         placeholder="Email"
-        value={email}
+        value={form.email}
         onChangeText={(text) => handleInputChange("email", text)}
         keyboardType="email-address"
         style={styles.input}
       />
       {errors.email && <Text style={styles.errorMessage}>{errors.email}</Text>}
 
-      <View style={styles.passwordContainer}>
-        <TextInput
-          placeholder="Password"
-          value={password}
-          onChangeText={(text) => handleInputChange("password", text)}
-          secureTextEntry={!isPasswordVisible}
-          style={styles.input}
-        />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-        >
-          <Ionicons
-            name={isPasswordVisible ? "eye" : "eye-off"}
-            size={20}
-            color="#3182ce"
-          />
-        </TouchableOpacity>
-      </View>
-      {errors.password && (
-        <Text style={styles.errorMessage}>{errors.password}</Text>
-      )}
+      <PasswordInput
+        value={form.password}
+        onChangeText={(text) => handleInputChange("password", text)}
+        placeholder="Password"
+        errorMessage={errors.password}
+      />
 
-      <View style={styles.passwordContainer}>
-        <TextInput
-          placeholder="Confirm Password"
-          value={confirmPassword}
-          onChangeText={(text) => handleInputChange("confirmPassword", text)}
-          secureTextEntry={!isConfirmPasswordVisible}
-          style={styles.input}
-        />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
-        >
-          <Ionicons
-            name={isConfirmPasswordVisible ? "eye" : "eye-off"}
-            size={20}
-            color="#3182ce"
-          />
-        </TouchableOpacity>
-      </View>
-      {errors.confirmPassword && (
-        <Text style={styles.errorMessage}>{errors.confirmPassword}</Text>
-      )}
+      <PasswordInput
+        value={form.confirmPassword}
+        onChangeText={(text) => handleInputChange("confirmPassword", text)}
+        placeholder="Confirm Password"
+        errorMessage={errors.confirmPassword}
+      />
       <TouchableOpacity onPress={pickImage} style={styles.imagePickerContainer}>
         <Ionicons name="image" size={40} color="#3182ce" />
         <Text style={styles.imagePickerText}>Select Profile Image</Text>
       </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {form.image && (
+        <Image source={{ uri: form.image }} style={styles.image} />
+      )}
       {errors.image && <Text style={styles.errorMessage}>{errors.image}</Text>}
 
       {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
@@ -339,14 +285,15 @@ const Register = () => {
       </TouchableOpacity>
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
           <Text style={styles.loginLink}>Login</Text>
         </TouchableOpacity>
       </View>
       <SuccessMessageModal
-        visible={isModalVisible}
+        visible={isSuccessMessageModalVisible}
         onClose={handleModalClose}
         message="User registered successfully!"
+        text="Go to Login"
       />
     </ScrollView>
   );
@@ -434,17 +381,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: "#3182ce",
     fontWeight: "600",
-  },
-  passwordContainer: {
-    position: "relative",
-    width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-  },
-  eyeIcon: {
-    position: "absolute",
-    right: 10,
-    top: 15,
   },
 });
 
