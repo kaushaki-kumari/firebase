@@ -5,6 +5,7 @@ interface UserState {
   lastName: string;
   mobileNo: string;
   email: string;
+  image: string | null;
   password: string;
   confirmPassword: string;
   errorMessage: string | null;
@@ -18,6 +19,7 @@ const initialState: UserState = {
   email: "",
   password: "",
   confirmPassword: "",
+  image: null,
   errorMessage: null,
   loading: false,
 };

@@ -52,8 +52,9 @@ const Register = () => {
     confirmPassword,
     errorMessage,
     loading,
+    image,
   } = user;
-  const [image, setImage] = useState<string | null>(null);
+  // const [image, setImage] = useState<string | null>(null);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -61,6 +62,7 @@ const Register = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    image: "",
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
@@ -68,7 +70,7 @@ const Register = () => {
 
   const resetForm = () => {
     dispatch(resetUserState());
-    setImage(null);
+    // setImage(null);
     setErrors({
       firstName: "",
       lastName: "",
@@ -76,6 +78,7 @@ const Register = () => {
       email: "",
       password: "",
       confirmPassword: "",
+      image: "",
     });
   };
 
@@ -101,7 +104,6 @@ const Register = () => {
       );
       dispatch(setErrorMessage(null));
       dispatch(setLoading(false));
-      setImage(null);
       setErrors({
         firstName: "",
         lastName: "",
@@ -109,6 +111,7 @@ const Register = () => {
         email: "",
         password: "",
         confirmPassword: "",
+        image: "",
       });
     };
   }, [dispatch]);
@@ -125,47 +128,38 @@ const Register = () => {
     let error = "";
     switch (field) {
       case "firstName":
-        if (!value) {
-          error = "First name is required.";
-        } else if (value.length < 3) {
+        if (!value) error = "First name is required.";
+        else if (value.length < 3)
           error = "First name must be at least 3 characters.";
-        }
         break;
       case "lastName":
-        if (!value) {
-          error = "Last name is required.";
-        } else if (value.length < 3) {
+        if (!value) error = "Last name is required.";
+        else if (value.length < 3)
           error = "Last name must be at least 3 characters.";
-        }
         break;
       case "mobileNo":
-        if (!value) {
-          error = "Mobile number is required.";
-        } else if (value.length !== 10) {
+        if (!value) error = "Mobile number is required.";
+        else if (!/^\d{10}$/.test(value))
           error = "Mobile number must be 10 digits.";
-        }
         break;
       case "email":
-        if (!value) {
-          error = "Email is required.";
-        } else if (!/\S+@\S+\.\S+/.test(value)) {
+        if (!value) error = "Email is required.";
+        else if (!/\S+@\S+\.\S+/.test(value))
           error = "Please enter a valid email address.";
-        }
         break;
       case "password":
         const passwordRegex =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-        if (!value) {
-          error = "Password is required.";
-        } else if (!passwordRegex.test(value)) {
+        if (!value) error = "Password is required.";
+        else if (!passwordRegex.test(value))
           error =
             "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.";
-        }
         break;
       case "confirmPassword":
-        if (value !== password) {
-          error = "Passwords do not match.";
-        }
+        if (value !== password) error = "Passwords do not match.";
+        break;
+      case "image":
+        if (!value) error = "Profile image is required.";
         break;
       default:
         break;
@@ -183,12 +177,8 @@ const Register = () => {
       email: validateField("email", email),
       password: validateField("password", password),
       confirmPassword: validateField("confirmPassword", confirmPassword),
+      image: validateField("image", image || ""),
     };
-
-    if (!image) {
-      newErrors.image = "Profile image is required.";
-      formIsValid = false;
-    }
 
     Object.values(newErrors).forEach((error) => {
       if (error) formIsValid = false;
@@ -227,7 +217,6 @@ const Register = () => {
           confirmPassword: "",
         })
       );
-      setImage(null);
       navigation.navigate("Login");
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -262,11 +251,10 @@ const Register = () => {
       quality: 1,
     });
 
-    if (result.canceled) {
-      dispatch(setErrorMessage("No image selected. Please select an image."));
+    if (!result.canceled) {
+      dispatch(setUserData({ image: result.assets[0].uri }));
     } else {
-      dispatch(setErrorMessage(null));
-      setImage(result.assets[0].uri);
+      dispatch(setErrorMessage("No image selected. Please select an image."));
     }
   };
 
@@ -361,9 +349,7 @@ const Register = () => {
         <Text style={styles.imagePickerText}>Select Profile Image</Text>
       </TouchableOpacity>
       {image && <Image source={{ uri: image }} style={styles.image} />}
-      {errors.image && (
-        <Text style={styles.errorMessage}>{errors.image}</Text>
-      )}
+      {errors.image && <Text style={styles.errorMessage}>{errors.image}</Text>}
 
       {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
       <TouchableOpacity
