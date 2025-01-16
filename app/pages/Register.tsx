@@ -11,20 +11,15 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { AppDispatch } from "../store/index";
+import { registerUser } from "../reducer/userActions";
 import * as ImagePicker from "expo-image-picker";
-import {
-  createUserWithEmailAndPassword,
-  AuthError,
-  AuthErrorCodes,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../config/firbase.config";
 import {
   setUserData,
   setLoading,
   setErrorMessage,
   resetUserState,
-} from "../features/userSlice";
+} from "../reducer/userSlice";
 import { RootState } from "../store";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -54,7 +49,6 @@ const Register = () => {
     loading,
     image,
   } = user;
-  // const [image, setImage] = useState<string | null>(null);
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
@@ -67,10 +61,8 @@ const Register = () => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false);
-
   const resetForm = () => {
     dispatch(resetUserState());
-    // setImage(null);
     setErrors({
       firstName: "",
       lastName: "",
@@ -116,130 +108,104 @@ const Register = () => {
     };
   }, [dispatch]);
 
-  const handleInputChange = (field: string, value: string) => {
-    dispatch(setUserData({ [field]: value }));
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [field]: validateField(field, value),
-    }));
-  };
-
   const validateField = (field: string, value: string) => {
     let error = "";
-    switch (field) {
-      case "firstName":
-        if (!value) error = "First name is required.";
-        else if (value.length < 3)
-          error = "First name must be at least 3 characters.";
-        break;
-      case "lastName":
-        if (!value) error = "Last name is required.";
-        else if (value.length < 3)
-          error = "Last name must be at least 3 characters.";
-        break;
-      case "mobileNo":
-        if (!value) error = "Mobile number is required.";
-        else if (!/^\d{10}$/.test(value))
-          error = "Mobile number must be 10 digits.";
-        break;
-      case "email":
-        if (!value) error = "Email is required.";
-        else if (!/\S+@\S+\.\S+/.test(value))
-          error = "Please enter a valid email address.";
-        break;
-      case "password":
+    const val = value ? value.toString() : "";
+
+    if (field === "firstName") {
+      if (!val.trim()) error = "First name is required.";
+      else if (val.length < 3)
+        error = "First name must be at least 3 characters.";
+    }
+    if (field === "lastName") {
+      if (!val.trim()) error = "Last name is required.";
+      else if (val.length < 3)
+        error = "Last name must be at least 3 characters.";
+    }
+    if (field === "mobileNo") {
+      if (!val.trim()) error = "Mobile number is required.";
+      else if (!/^\d{10}$/.test(val))
+        error = "Mobile number must be 10 digits.";
+    }
+    if (field === "email") {
+      if (!val.trim()) error = "Email is required.";
+      else if (!/\S+@\S+\.\S+/.test(val))
+        error = "Please enter a valid email address.";
+    }
+    if (field === "password") {
+      if (!val.trim()) error = "Password is required.";
+      else {
         const passwordRegex =
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
-        if (!value) error = "Password is required.";
-        else if (!passwordRegex.test(value))
+        if (!passwordRegex.test(val)) {
           error =
             "Password must be at least 8 characters, include uppercase, lowercase, a number, and a special character.";
-        break;
-      case "confirmPassword":
-        if (value !== password) error = "Passwords do not match.";
-        break;
-      case "image":
-        if (!value) error = "Profile image is required.";
-        break;
-      default:
-        break;
+        }
+      }
+    }
+    if (field === "confirmPassword") {
+      if (val !== password) error = "Passwords do not match.";
+    }
+    if (field === "image") {
+      if (!val.trim()) error = "Profile image is required.";
     }
     return error;
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    dispatch(setUserData({ [field]: value }));
+    const error = validateField(field, value);
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [field]: error,
+    }));
   };
 
   const handleSignup = async () => {
     let formIsValid = true;
 
-    const newErrors = {
-      firstName: validateField("firstName", firstName),
-      lastName: validateField("lastName", lastName),
-      mobileNo: validateField("mobileNo", mobileNo),
-      email: validateField("email", email),
-      password: validateField("password", password),
-      confirmPassword: validateField("confirmPassword", confirmPassword),
-      image: validateField("image", image || ""),
-    };
+    const newErrors: any = {};
+    const fields = [
+      "firstName",
+      "lastName",
+      "mobileNo",
+      "email",
+      "password",
+      "confirmPassword",
+      "image",
+    ];
 
-    Object.values(newErrors).forEach((error) => {
+    fields.forEach((field) => {
+      const value = user[field as keyof typeof user] as string;
+      const error = validateField(field, value);
+      newErrors[field] = error;
       if (error) formIsValid = false;
     });
 
     setErrors(newErrors);
+
     if (!formIsValid) return;
-    dispatch(setErrorMessage(null));
-    dispatch(setLoading(true));
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        firstName,
-        lastName,
-        mobileNo,
-        email,
-        profileImage: image,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
-      alert("User registered successfully");
-      dispatch(
-        setUserData({
-          firstName: "",
-          lastName: "",
-          mobileNo: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
+      const result = await (dispatch as AppDispatch)(
+        registerUser({
+          firstName,
+          lastName,
+          mobileNo,
+          email,
+          password,
+          confirmPassword,
         })
       );
-      navigation.navigate("Login");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        const firebaseError = error as AuthError;
 
-        const errorMessages: Record<string, string> = {
-          [AuthErrorCodes.WEAK_PASSWORD]:
-            "Password should be at least 6 characters.",
-          [AuthErrorCodes.EMAIL_EXISTS]: "The email address is already in use.",
-          [AuthErrorCodes.INVALID_EMAIL]: "The email address is invalid.",
-        };
-
-        dispatch(
-          setErrorMessage(
-            errorMessages[firebaseError.code] ||
-              "An error occurred, please try again."
-          )
-        );
+      if (registerUser.fulfilled.match(result)) {
+        alert("User registered successfully");
+        navigation.navigate("Login");
       } else {
-        dispatch(setErrorMessage("An unexpected error occurred."));
+        console.error("Registration failed:", result);
       }
-    } finally {
-      dispatch(setLoading(false));
+    } catch (error) {
+      console.error("An error occurred during signup:", error);
     }
   };
 
@@ -260,7 +226,8 @@ const Register = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Register</Text>
+      <Text style={styles.title}>Register Now – Start Your Journey</Text>
+      <Text style={styles.subTitle}>Register</Text>
       <TextInput
         placeholder="First Name"
         value={firstName}
@@ -380,8 +347,15 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700",
+    color: "#2d3748",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  subTitle: {
+    fontSize: 20,
+    fontWeight: "600",
     color: "#2d3748",
     marginBottom: 10,
     textAlign: "center",
