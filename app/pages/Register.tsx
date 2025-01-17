@@ -22,7 +22,7 @@ import { RootState } from "../store";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
-import { FormState } from "../utils/userData";
+import { userState } from "../utils/userData";
 import { StatusBar } from "expo-status-bar";
 type RootStackParamList = {
   Register: undefined;
@@ -39,7 +39,7 @@ const Register = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const user = useSelector((state: RootState) => state.user);
   const { errorMessage, loading } = user;
-  const [form, setForm] = useState<FormState>({
+  const [form, setForm] = useState<userState>({
     firstName: "",
     lastName: "",
     mobileNo: "",
@@ -48,7 +48,7 @@ const Register = () => {
     confirmPassword: "",
     image: "",
   });
-  const [errors, setErrors] = useState<FormState>({
+  const [errors, setErrors] = useState<userState>({
     firstName: "",
     lastName: "",
     mobileNo: "",
@@ -144,9 +144,9 @@ const Register = () => {
 
   const handleSignup = async () => {
     let formIsValid = true;
-    const newErrors: Partial<FormState> = {};
+    const newErrors: Partial<userState> = {};
 
-    const fields: (keyof FormState)[] = [
+    const fields: (keyof userState)[] = [
       "firstName",
       "lastName",
       "mobileNo",
@@ -316,11 +316,17 @@ const Register = () => {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Profile image</Text>
           <View style={styles.imagePickerContainer}>
-            <TouchableOpacity onPress={() => pickImage("gallery")} style={styles.imageContent}>
+            <TouchableOpacity
+              onPress={() => pickImage("gallery")}
+              style={styles.imageContent}
+            >
               <Ionicons name="image" size={32} color="#3182ce" />
               <Text style={styles.imagePickerText}>From Gallery</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => pickImage("camera")} style={styles.imageContent}>
+            <TouchableOpacity
+              onPress={() => pickImage("camera")}
+              style={styles.imageContent}
+            >
               <Ionicons name="camera" size={32} color="#3182ce" />
               <Text style={styles.imagePickerText}>From Camera</Text>
             </TouchableOpacity>
@@ -448,7 +454,7 @@ const styles = StyleSheet.create({
   },
   imagePickerContainer: {
     flexDirection: "row",
-    justifyContent:'space-around',
+    justifyContent: "space-around",
     backgroundColor: "white",
     padding: 5,
     borderRadius: 8,
@@ -458,14 +464,14 @@ const styles = StyleSheet.create({
   imagePickerText: {
     marginLeft: 10,
     fontSize: 15,
-    marginTop:5,
+    marginTop: 5,
     color: "#3182ce",
     fontWeight: "500",
   },
-  imageContent:{
-display:'flex',
-flexDirection:'row'
-  }
+  imageContent: {
+    display: "flex",
+    flexDirection: "row",
+  },
 });
 
 export default Register;

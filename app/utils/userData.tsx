@@ -1,4 +1,4 @@
-  export interface FormState {
+  export interface userState {
     firstName: string;
     lastName: string;
     mobileNo: string;
