@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser } from "./userActions";
 
 interface UserDetails {
-  uid?: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  mobileNo?: string;
+  uid: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  mobileNo: string;
 }
 
 interface UserState {

@@ -21,7 +21,6 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
 import {FormState} from "../userInfo/userData"
-import { ErrorState } from "../userInfo/userData";
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
@@ -46,7 +45,7 @@ const Register = () => {
     confirmPassword: "",
     image: "",
   });
-  const [errors, setErrors] = useState<ErrorState>({
+  const [errors, setErrors] = useState<FormState>({
     firstName: "",
     lastName: "",
     mobileNo: "",
@@ -141,7 +140,7 @@ const Register = () => {
 
   const handleSignup = async () => {
     let formIsValid = true;
-    const newErrors: Partial<ErrorState> = {};
+    const newErrors: Partial<FormState> = {};
 
     const fields: (keyof FormState)[] = [
       "firstName",
