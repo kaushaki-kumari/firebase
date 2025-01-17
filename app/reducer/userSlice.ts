@@ -1,18 +1,23 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser } from "./userActions";
 
-interface UserState {
+interface UserDetails {
   uid?: string;
   email?: string;
   firstName?: string;
   lastName?: string;
   mobileNo?: string;
-  status?: "idle" | "loading" | "succeeded" | "failed";
-  loading?: boolean;
-  errorMessage?: string | null;
+}
+
+interface UserState {
+  user: UserDetails | null; 
+  status: "idle" | "loading" | "succeeded" | "failed";
+  loading: boolean;
+  errorMessage: string | null;
 }
 
 const initialState: UserState = {
+  user: null, 
   status: "idle",
   loading: false,
   errorMessage: null,
@@ -33,9 +38,15 @@ const userSlice = createSlice({
         state.loading = true;
         state.errorMessage = null;
       })
-      .addCase(registerUser.fulfilled, (state, action: PayloadAction<UserState>) => {
-        return { ...state, ...action.payload, status: "succeeded", loading: false, errorMessage: null };
-      })
+      .addCase(
+        registerUser.fulfilled,
+        (state, action: PayloadAction<UserDetails>) => {
+          state.user = action.payload; 
+          state.status = "succeeded";
+          state.loading = false;
+          state.errorMessage = null;
+        }
+      )
       .addCase(registerUser.rejected, (state, action) => {
         state.status = "failed";
         state.loading = false;

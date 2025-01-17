@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
 import {FormState} from "../userInfo/userData"
+import { ErrorState } from "../userInfo/userData";
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
@@ -30,15 +31,6 @@ type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Register"
 >;
-interface ErrorState {
-  firstName: string;
-  lastName: string;
-  mobileNo: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  image: string;
-}
 
 const Register = () => {
   const dispatch = useDispatch();
