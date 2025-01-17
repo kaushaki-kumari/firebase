@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import SuccessMessageModal from "../components/modal/SuccessMessageModal";
 import {
   View,
   Text,
@@ -13,17 +11,20 @@ import {
   Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { Camera } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import { StatusBar } from "expo-status-bar";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../store/index";
 import { registerUser } from "../reducer/userActions";
-import * as ImagePicker from "expo-image-picker";
-import { Camera } from "expo-camera";
 import { setErrorMessage } from "../reducer/userSlice";
 import { RootState } from "../store";
+import SuccessMessageModal from "../components/modal/SuccessMessageModal";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
 import { userState } from "../utils/userData";
-import { StatusBar } from "expo-status-bar";
+
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
