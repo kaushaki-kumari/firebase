@@ -15,11 +15,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { AppDispatch } from "../store/index";
 import { registerUser } from "../reducer/userActions";
 import * as ImagePicker from "expo-image-picker";
-import {  setErrorMessage } from "../reducer/userSlice";
+import { setErrorMessage } from "../reducer/userSlice";
 import { RootState } from "../store";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
+import {FormState} from "../userInfo/userData"
 type RootStackParamList = {
   Register: undefined;
   Login: undefined;
@@ -29,13 +30,22 @@ type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Register"
 >;
+interface ErrorState {
+  firstName: string;
+  lastName: string;
+  mobileNo: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  image: string;
+}
 
 const Register = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const user = useSelector((state: RootState) => state.user);
   const { errorMessage, loading } = user;
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     firstName: "",
     lastName: "",
     mobileNo: "",
@@ -44,7 +54,7 @@ const Register = () => {
     confirmPassword: "",
     image: "",
   });
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<ErrorState>({
     firstName: "",
     lastName: "",
     mobileNo: "",
@@ -73,7 +83,8 @@ const Register = () => {
       image: "",
     });
   };
-  const [isSuccessMessageModalVisible, setSuccessMessageModalVisible] = useState(false);
+  const [isSuccessMessageModalVisible, setSuccessMessageModalVisible] =
+    useState(false);
   useEffect(() => {
     const resetFormField = navigation.addListener("focus", () => {
       resetForm();
@@ -138,9 +149,9 @@ const Register = () => {
 
   const handleSignup = async () => {
     let formIsValid = true;
+    const newErrors: Partial<ErrorState> = {};
 
-    const newErrors: any = {};
-    const fields = [
+    const fields: (keyof FormState)[] = [
       "firstName",
       "lastName",
       "mobileNo",
@@ -151,13 +162,13 @@ const Register = () => {
     ];
 
     fields.forEach((field) => {
-      const value = form[field as keyof typeof form] as string;
+      const value = form[field];
       const error = validateField(field, value);
       newErrors[field] = error;
       if (error) formIsValid = false;
     });
 
-    setErrors(newErrors);
+    setErrors((prevErrors) => ({ ...prevErrors, ...newErrors }));
 
     if (!formIsValid) return;
 
@@ -176,7 +187,6 @@ const Register = () => {
       if (registerUser.fulfilled.match(result)) {
         resetForm();
         setSuccessMessageModalVisible(true);
-
       } else {
         console.error("Registration failed:", result);
       }

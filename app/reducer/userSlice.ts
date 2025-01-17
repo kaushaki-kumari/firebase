@@ -1,13 +1,27 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { registerUser } from "./userActions";
 
-type UserState = Record<string, any>;
+interface UserState {
+  uid?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  mobileNo?: string;
+  status?: "idle" | "loading" | "succeeded" | "failed";
+  loading?: boolean;
+  errorMessage?: string | null;
+}
 
-const initialState: UserState = {};
+const initialState: UserState = {
+  status: "idle",
+  loading: false,
+  errorMessage: null,
+};
+
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {   
+  reducers: {
     setErrorMessage: (state, action: PayloadAction<string | null>) => {
       state.errorMessage = action.payload;
     },
@@ -30,5 +44,5 @@ const userSlice = createSlice({
   },
 });
 
-export const {  setErrorMessage } = userSlice.actions;
+export const { setErrorMessage } = userSlice.actions;
 export default userSlice.reducer;
