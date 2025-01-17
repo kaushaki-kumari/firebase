@@ -56,13 +56,13 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "white",
-    padding: 14,
+    padding: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#e2e8f0",
     color: "#4a5568",
     fontSize: 16,
-    marginBottom: 13,
+   
     width: "100%",
   },
   eyeIcon: {
@@ -73,8 +73,9 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: "#e53e3e",
     marginBottom: 10,
-    marginLeft: "auto",
-    marginRight: "auto",
+    textAlign: "left",
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 
