@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SuccessMessageModal from "../modal/SuccessMessageModal";
+import SuccessMessageModal from "../components/modal/SuccessMessageModal";
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ import { RootState } from "../store";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
-import { FormState } from "../userInfo/userData";
+import { FormState } from "../utils/userData";
 import { StatusBar } from "expo-status-bar";
 type RootStackParamList = {
   Register: undefined;
