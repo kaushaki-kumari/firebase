@@ -1,9 +1,7 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   ActivityIndicator,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -15,18 +13,10 @@ import { FirebaseError } from "firebase/app";
 import { AppDispatch, RootState } from "../store";
 import { setErrorMessage } from "../reducer/userSlice";
 import { auth } from "../config/firbase.config";
+import {RegisterScreenNavigationProp} from "../types/types"
 import PasswordInput from "../components/PasswordInput";
-
-type RootStackParamList = {
-  Profile: undefined;
-  Login: undefined;
-  Register: undefined;
-};
-
-type RegisterScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Profile"
->;
+import PageStyles from "../styles/PageStyles";
+import { validateEmail } from "../utils/ValidateEmail";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -46,11 +36,6 @@ function Login() {
   const clearErrors = () => {
     setErrors({});
     dispatch(setErrorMessage(null));
-  };
-
-  const validateEmail = (email: string) => {
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailPattern.test(email);
   };
 
   const handleLogin = async () => {
@@ -103,21 +88,23 @@ function Login() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login Your Account</Text>
-      <View style={styles.inputContainer}>
+    <View style={PageStyles.container}>
+      <Text style={PageStyles.title}>Login Your Account</Text>
+      <View style={PageStyles.inputContainer}>
         <TextInput
           placeholder="Email"
           value={formData.email}
           onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
-          style={styles.input}
+          style={PageStyles.input}
         />
-        {errors.email && <Text style={styles.fieldError}>{errors.email}</Text>}
+        {errors.email && (
+          <Text style={PageStyles.fieldError}>{errors.email}</Text>
+        )}
       </View>
 
-      <View style={styles.inputContainer}>
+      <View style={PageStyles.inputContainer}>
         <PasswordInput
           placeholder="Password"
           value={formData.password}
@@ -128,105 +115,27 @@ function Login() {
           errorMessage={errors.password}
         />
       </View>
-      {reduxError && <Text style={styles.errorMessage}>{reduxError}</Text>}
+      {reduxError && <Text style={PageStyles.errorMessage}>{reduxError}</Text>}
       <TouchableOpacity
         onPress={handleLogin}
-        style={[styles.button, loading && styles.buttonDisabled]}
+        style={[PageStyles.button, loading && PageStyles.buttonDisabled]}
         disabled={loading}
       >
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={PageStyles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
 
-      <View style={styles.footer}>
-        <Text style={styles.footerText}>Don't have an account? </Text>
+      <View style={PageStyles.footer}>
+        <Text style={PageStyles.footerText}>Don't have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.loginLink}>Sign up</Text>
+          <Text style={PageStyles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#f9fafb",
-    padding: 20,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#2d3748",
-    marginBottom: 10,
-    textAlign: "center",
-  },
-  inputContainer: {
-    width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-    marginBottom: 13,
-  },
-  input: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    color: "#4a5568",
-    fontSize: 16,
-    width: "100%",
-  },
-  fieldError: {
-    color: "#e53e3e",
-    fontSize: 12,
-    marginTop: 4,
-    paddingHorizontal: 2,
-  },
-  button: {
-    backgroundColor: "#3182ce",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    justifyContent: "center",
-    marginTop: 15,
-    alignItems: "center",
-    width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-  },
-  buttonDisabled: {
-    backgroundColor: "#94a3b8",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  errorMessage: {
-    color: "#e53e3e",
-    marginBottom: 15,
-    fontSize: 14,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-  footer: {
-    marginTop: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  footerText: {
-    color: "#4a5568",
-  },
-  loginLink: {
-    color: "#3182ce",
-    fontWeight: "600",
-  },
-});
 
 export default Login;

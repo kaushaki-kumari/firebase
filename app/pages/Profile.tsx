@@ -1,46 +1,41 @@
-import React from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
-import { auth } from '../config/firbase.config'; 
-
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { auth } from "../config/firbase.config";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-type RootStackParamList = {
-  Profile: undefined;
-  Login: undefined;
-};
-type RegisterScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Profile"
->;
+import { RegisterScreenNavigationProp } from "../types/types";
+import PageStyles from "../styles/PageStyles";
+
 function Profile() {
-  const user = auth.currentUser; 
+  const user = auth.currentUser;
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const handleLogout = () => {
     auth.signOut();
-    navigation.navigate('Login'); 
+    navigation.navigate("Login");
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome, {user?.displayName || 'User'}!</Text>
-      <Text>Email: {user?.email}</Text>
-      <Button title="Logout" onPress={handleLogout} />
+    <View style={PageStyles.container}>
+      <Text style={PageStyles.title}>
+        Welcome, {user?.displayName || "User"}!
+      </Text>
+      <Text style={PageStyles.label}>Email: {user?.email}</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogout}>
+        <Text style={PageStyles.buttonText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
+export default Profile;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
+  button: {
+    backgroundColor: "#3182ce",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 10,
+    padding: 10,
+    cursor: "pointer",
   },
 });
-
-export default Profile;

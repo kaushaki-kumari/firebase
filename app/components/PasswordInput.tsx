@@ -7,6 +7,7 @@ import {
   Text,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import PageStyles from "../styles/PageStyles";
 
 interface PasswordInputProps {
   value: string;
@@ -14,7 +15,6 @@ interface PasswordInputProps {
   placeholder: string;
   errorMessage?: string;
 }
-
 const PasswordInput: React.FC<PasswordInputProps> = ({
   value,
   onChangeText,
@@ -30,7 +30,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         value={value}
         onChangeText={onChangeText}
         secureTextEntry={!isPasswordVisible}
-        style={styles.input}
+        style={PageStyles.input}
       />
       <TouchableOpacity
         style={styles.eyeIcon}
@@ -42,7 +42,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           color="#3182ce"
         />
       </TouchableOpacity>
-      {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
+      {errorMessage && <Text style={PageStyles.errorMessage}>{errorMessage}</Text>}
     </View>
   );
 };
@@ -54,28 +54,10 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     alignSelf: "center",
   },
-  input: {
-    backgroundColor: "white",
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    color: "#4a5568",
-    fontSize: 16,
-   
-    width: "100%",
-  },
   eyeIcon: {
     position: "absolute",
     right: 10,
     top: 15,
-  },
-  errorMessage: {
-    color: "#e53e3e",
-    marginBottom: 10,
-    textAlign: "left",
-    fontSize: 12,
-    marginTop: 4,
   },
 });
 
