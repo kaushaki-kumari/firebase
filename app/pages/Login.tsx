@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import {
   ActivityIndicator,
@@ -7,13 +7,11 @@ import {
   View,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FirebaseError } from "firebase/app";
 import { AppDispatch, RootState } from "../store";
-import { setErrorMessage } from "../reducer/userSlice";
-import { auth } from "../config/firbase.config";
-import {RegisterScreenNavigationProp} from "../types/types"
+import { loginUser } from "../reducer/userActions";
+import { clearErrors } from "../reducer/userSlice";
+import { RegisterScreenNavigationProp } from "../types/types";
 import PasswordInput from "../components/PasswordInput";
 import PageStyles from "../styles/PageStyles";
 import { validateEmail } from "../utils/ValidateEmail";
@@ -23,7 +21,6 @@ function Login() {
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
     password?: string;
@@ -31,59 +28,42 @@ function Login() {
 
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
-  const reduxError = useSelector((state: RootState) => state.user.errorMessage);
+  const { loading, errorMessage } = useSelector(
+    (state: RootState) => state.user
+  );
 
-  const clearErrors = () => {
+  const handleClearErrors = () => {
     setErrors({});
-    dispatch(setErrorMessage(null));
+    dispatch(clearErrors());
   };
 
   const handleLogin = async () => {
-    clearErrors();
+    handleClearErrors();
     const newErrors: typeof errors = {};
+
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    setLoading(true);
-    try {
-      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+
+    const result = await dispatch(loginUser(formData));
+    if (loginUser.fulfilled.match(result)) {
       navigation.navigate("Profile");
-    } catch (error) {
-      const firebaseError = error as FirebaseError;
-      console.log("Firebase error code:", firebaseError.code);
-      if (firebaseError.code === "auth/invalid-credential") {
-        dispatch(
-          setErrorMessage(
-            "Invalid credentials, please check your email or password"
-          )
-        );
-      } else if (firebaseError.code === "auth/network-request-failed") {
-        dispatch(
-          setErrorMessage("Network error. Please check your connection.")
-        );
-      } else {
-        console.log("Unhandled error code:", firebaseError.code);
-        dispatch(setErrorMessage("An unexpected error occurred."));
-      }
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleEmailChange = (text: string) => {
     setFormData({ ...formData, email: text });
-    clearErrors();
+    handleClearErrors();
 
     if (text && !validateEmail(text)) {
       setErrors((prevErrors) => ({
         ...prevErrors,
         email: "Invalid email format",
       }));
-    } else {
-      clearErrors();
     }
   };
 
@@ -110,12 +90,15 @@ function Login() {
           value={formData.password}
           onChangeText={(text) => {
             setFormData({ ...formData, password: text });
-            clearErrors();
+            handleClearErrors();
           }}
           errorMessage={errors.password}
         />
+        {errorMessage && (
+          <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
+        )}
       </View>
-      {reduxError && <Text style={PageStyles.errorMessage}>{reduxError}</Text>}
+
       <TouchableOpacity
         onPress={handleLogin}
         style={[PageStyles.button, loading && PageStyles.buttonDisabled]}

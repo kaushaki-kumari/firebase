@@ -31,6 +31,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
         onChangeText={onChangeText}
         secureTextEntry={!isPasswordVisible}
         style={PageStyles.input}
+        autoCapitalize="none"
       />
       <TouchableOpacity
         style={styles.eyeIcon}
