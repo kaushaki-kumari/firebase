@@ -15,17 +15,18 @@ import { RegisterScreenNavigationProp } from "../types/types";
 import PasswordInput from "../components/PasswordInput";
 import PageStyles from "../styles/PageStyles";
 import { validateEmail } from "../utils/ValidateEmail";
+import { FormData } from "../utils/userData";
+interface Errors {
+  email?: string;
+  password?: string;
+}
 
 function Login() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
   });
-  const [errors, setErrors] = useState<{
-    email?: string;
-    password?: string;
-  }>({});
-
+  const [errors, setErrors] = useState<Errors>({});
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { loading, errorMessage } = useSelector(
@@ -39,7 +40,7 @@ function Login() {
 
   const handleLogin = async () => {
     handleClearErrors();
-    const newErrors: typeof errors = {};
+    const newErrors: Errors = {};
 
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
@@ -71,6 +72,7 @@ function Login() {
     <View style={PageStyles.container}>
       <Text style={PageStyles.title}>Login Your Account</Text>
       <View style={PageStyles.inputContainer}>
+        <Text style={PageStyles.label}>Email</Text>
         <TextInput
           placeholder="Email"
           value={formData.email}
@@ -79,12 +81,13 @@ function Login() {
           autoCapitalize="none"
           style={PageStyles.input}
         />
-        {errors.email && (
+        {errors.email !== undefined && errors.email !== "" && (
           <Text style={PageStyles.fieldError}>{errors.email}</Text>
         )}
       </View>
 
       <View style={PageStyles.inputContainer}>
+        <Text style={PageStyles.label}>Password</Text>
         <PasswordInput
           placeholder="Password"
           value={formData.password}
@@ -92,9 +95,9 @@ function Login() {
             setFormData({ ...formData, password: text });
             handleClearErrors();
           }}
-          errorMessage={errors.password}
+          errorMessage={errors.password !== undefined && errors.password !== "" ? errors.password : ""}
         />
-        {errorMessage && (
+        {errorMessage !== undefined && errorMessage !== "" && (
           <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
         )}
       </View>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,9 +12,15 @@ function Profile() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const user = useSelector((state: RootState) => state.user.user);
+
+  useEffect(() => {
+    if (!user) {
+      navigation.navigate("Login");
+    }
+  }, [user, navigation]);
+
   if (!user) {
-    navigation.navigate("Login");
-    return null;
+    return null; 
   }
 
   const handleLogout = () => {
