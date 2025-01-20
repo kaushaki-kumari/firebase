@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { connect } from "react-redux";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -22,6 +23,23 @@ try {
     throw error; 
   }
 }
+
+// connect= (accessToken , config)=> {
+//   let one = firebase.app().database["fbApp"];
+//   one.auth().currentUser.getToken()
+//     .then(idToken => firebase.auth.GoogleAuthProvider.credential(idToken, accessToken))
+//     .then(credential => {
+//       let two = firebase.initializeApp(config, `[${config.apiKey}]`);
+//       return two.auth().signInWithCredential(credential);
+//     })
+//     .catch(console.warn)
+//     .then(console.info);
+// }
+
+// two.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
+//   .then(function(result) {
+//     return one.auth().signInWithCredential(result.credential);
+//   });
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);

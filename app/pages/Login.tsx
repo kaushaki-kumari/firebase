@@ -15,6 +15,7 @@ import { RegisterScreenNavigationProp } from "../types/types";
 import PasswordInput from "../components/PasswordInput";
 import PageStyles from "../styles/PageStyles";
 import { validateEmail } from "../utils/ValidateEmail";
+import SocialIcon from "../components/SocialIcon";
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -117,6 +118,7 @@ function Login() {
           <Text style={PageStyles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
+      <SocialIcon />
     </View>
   );
 }

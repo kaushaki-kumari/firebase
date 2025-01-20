@@ -24,8 +24,9 @@ import { useNavigation } from "@react-navigation/native";
 import PasswordInput from "../components/PasswordInput";
 import { userState } from "../utils/userData";
 import PageStyles from "../styles/PageStyles";
-import {RegisterScreenNavigationProp} from "../types/types"
+import { RegisterScreenNavigationProp } from "../types/types";
 import { validateEmail } from "../utils/ValidateEmail";
+import SocialIcon from "../components/SocialIcon";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -103,7 +104,9 @@ const Register = () => {
     }
     if (field === "email") {
       if (!val.trim()) error = "Email is required.";
-      else if (!validateEmail(val)) error = "Please enter a valid email address.";}
+      else if (!validateEmail(val))
+        error = "Please enter a valid email address.";
+    }
     if (field === "password") {
       if (!val.trim()) error = "Password is required.";
       else {
@@ -352,7 +355,7 @@ const Register = () => {
             <Text style={PageStyles.footerLink}>Login</Text>
           </TouchableOpacity>
         </View>
-
+        <SocialIcon />
         <SuccessMessageModal
           visible={isSuccessMessageModalVisible}
           onClose={handleModalClose}
