@@ -21,19 +21,11 @@ import { setErrorMessage } from "../reducer/userSlice";
 import { RootState } from "../store";
 import SuccessMessageModal from "../components/modal/SuccessMessageModal";
 import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PasswordInput from "../components/PasswordInput";
 import { userState } from "../utils/userData";
-
-type RootStackParamList = {
-  Register: undefined;
-  Login: undefined;
-};
-
-type RegisterScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Register"
->;
+import PageStyles from "../styles/PageStyles";
+import {RegisterScreenNavigationProp} from "../types/types"
+import { validateEmail } from "../utils/ValidateEmail";
 
 const Register = () => {
   const dispatch = useDispatch();
@@ -111,9 +103,7 @@ const Register = () => {
     }
     if (field === "email") {
       if (!val.trim()) error = "Email is required.";
-      else if (!/\S+@\S+\.\S+/.test(val))
-        error = "Please enter a valid email address.";
-    }
+      else if (!validateEmail(val)) error = "Please enter a valid email address.";}
     if (field === "password") {
       if (!val.trim()) error = "Password is required.";
       else {
@@ -234,68 +224,68 @@ const Register = () => {
   return (
     <>
       <StatusBar style="dark" backgroundColor="#f9fafb" />
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Register Now – Start Your Journey</Text>
+      <ScrollView contentContainerStyle={PageStyles.container}>
+        <Text style={PageStyles.title}>Register Now – Start Your Journey</Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>First name</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>First name</Text>
           <TextInput
             placeholder="Enter your first name"
             value={form.firstName}
             onChangeText={(text) => handleInputChange("firstName", text)}
-            style={styles.input}
+            style={PageStyles.input}
             autoCapitalize="none"
           />
           {errors.firstName && (
-            <Text style={styles.errorMessage}>{errors.firstName}</Text>
+            <Text style={PageStyles.errorMessage}>{errors.firstName}</Text>
           )}
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Last name</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Last name</Text>
           <TextInput
             placeholder="Enter your last name"
             value={form.lastName}
             onChangeText={(text) => handleInputChange("lastName", text)}
-            style={styles.input}
+            style={PageStyles.input}
             autoCapitalize="none"
           />
           {errors.lastName && (
-            <Text style={styles.errorMessage}>{errors.lastName}</Text>
+            <Text style={PageStyles.errorMessage}>{errors.lastName}</Text>
           )}
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Mobile number</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Mobile number</Text>
           <TextInput
             placeholder="Enter your mobile number"
             value={form.mobileNo}
             onChangeText={(text) => handleInputChange("mobileNo", text)}
             keyboardType="phone-pad"
-            style={styles.input}
+            style={PageStyles.input}
           />
           {errors.mobileNo && (
-            <Text style={styles.errorMessage}>{errors.mobileNo}</Text>
+            <Text style={PageStyles.errorMessage}>{errors.mobileNo}</Text>
           )}
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Email</Text>
           <TextInput
             placeholder="Enter your email"
             value={form.email}
             onChangeText={(text) => handleInputChange("email", text)}
             keyboardType="email-address"
-            style={styles.input}
+            style={PageStyles.input}
             autoCapitalize="none"
           />
           {errors.email && (
-            <Text style={styles.errorMessage}>{errors.email}</Text>
+            <Text style={PageStyles.errorMessage}>{errors.email}</Text>
           )}
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Password</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Password</Text>
           <PasswordInput
             value={form.password}
             onChangeText={(text) => handleInputChange("password", text)}
@@ -304,8 +294,8 @@ const Register = () => {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Confirm password</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Confirm password</Text>
           <PasswordInput
             value={form.confirmPassword}
             onChangeText={(text) => handleInputChange("confirmPassword", text)}
@@ -314,8 +304,8 @@ const Register = () => {
           />
         </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Profile image</Text>
+        <View style={PageStyles.inputContainer}>
+          <Text style={PageStyles.label}>Profile image</Text>
           <View style={styles.imagePickerContainer}>
             <TouchableOpacity
               onPress={() => pickImage("gallery")}
@@ -336,30 +326,30 @@ const Register = () => {
             <Image source={{ uri: form.image }} style={styles.image} />
           )}
           {errors.image && (
-            <Text style={styles.errorMessage}>{errors.image}</Text>
+            <Text style={PageStyles.errorMessage}>{errors.image}</Text>
           )}
         </View>
 
         {errorMessage && (
-          <Text style={styles.errorMessage}>{errorMessage}</Text>
+          <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
         )}
 
         <TouchableOpacity
           onPress={handleSignup}
-          style={[styles.button, loading && styles.buttonDisabled]}
+          style={[PageStyles.button, loading && PageStyles.buttonDisabled]}
           disabled={loading}
         >
           {loading ? (
             <ActivityIndicator color="white" />
           ) : (
-            <Text style={styles.buttonText}>Sign up</Text>
+            <Text style={PageStyles.buttonText}>Sign up</Text>
           )}
         </TouchableOpacity>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+        <View style={PageStyles.footer}>
+          <Text style={PageStyles.footerText}>Already have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <Text style={styles.loginLink}>Login</Text>
+            <Text style={PageStyles.footerLink}>Login</Text>
           </TouchableOpacity>
         </View>
 
@@ -375,77 +365,6 @@ const Register = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#f9fafb",
-    padding: 20,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#2d3748",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  inputContainer: {
-    marginBottom: 10,
-    width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#4a5568",
-    marginBottom: 6,
-  },
-  input: {
-    backgroundColor: "white",
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-    color: "#4a5568",
-    fontSize: 16,
-    width: "100%",
-  },
-  errorMessage: {
-    color: "#e53e3e",
-    fontSize: 12,
-    marginTop: 4,
-  },
-  button: {
-    backgroundColor: "#3182ce",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    maxWidth: 400,
-    alignSelf: "center",
-  },
-  buttonDisabled: {
-    backgroundColor: "#94a3b8",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  footer: {
-    marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  footerText: {
-    color: "#4a5568",
-  },
-  loginLink: {
-    color: "#3182ce",
-    fontWeight: "600",
-  },
   image: {
     width: 100,
     height: 100,

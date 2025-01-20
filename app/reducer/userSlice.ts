@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { registerUser } from "./userActions";
+import { loginUser, registerUser, logoutUser } from "./userActions";
 
 interface UserDetails {
   uid: string;
@@ -10,14 +10,14 @@ interface UserDetails {
 }
 
 interface UserState {
-  user: UserDetails | null; 
+  user: UserDetails | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   loading: boolean;
   errorMessage: string | null;
 }
 
 const initialState: UserState = {
-  user: null, 
+  user: null,
   status: "idle",
   loading: false,
   errorMessage: null,
@@ -30,6 +30,9 @@ const userSlice = createSlice({
     setErrorMessage: (state, action: PayloadAction<string | null>) => {
       state.errorMessage = action.payload;
     },
+    clearErrors: (state) => {
+      state.errorMessage = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -41,7 +44,7 @@ const userSlice = createSlice({
       .addCase(
         registerUser.fulfilled,
         (state, action: PayloadAction<UserDetails>) => {
-          state.user = action.payload; 
+          state.user = action.payload;
           state.status = "succeeded";
           state.loading = false;
           state.errorMessage = null;
@@ -51,9 +54,34 @@ const userSlice = createSlice({
         state.status = "failed";
         state.loading = false;
         state.errorMessage = action.payload as string;
+      })
+      .addCase(loginUser.pending, (state) => {
+        state.status = "loading";
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(
+        loginUser.fulfilled,
+        (state, action: PayloadAction<UserDetails>) => {
+          state.user = action.payload;
+          state.status = "succeeded";
+          state.loading = false;
+          state.errorMessage = null;
+        }
+      )
+      .addCase(loginUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.loading = false;
+        state.errorMessage = action.payload as string;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.status = "idle";
+        state.loading = false;
+        state.errorMessage = null;
       });
   },
 });
 
-export const { setErrorMessage } = userSlice.actions;
+export const { setErrorMessage, clearErrors } = userSlice.actions;
 export default userSlice.reducer;
