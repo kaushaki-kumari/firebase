@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { loginUser, registerUser, logoutUser } from "./userActions";
+import { loginUser, registerUser, logoutUser, updateUserDetails } from "./userActions";
 
 interface UserDetails {
   uid: string;
@@ -36,7 +36,6 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Register cases
       .addCase(registerUser.pending, (state) => {
         state.status = "loading";
         state.loading = true;
@@ -80,9 +79,20 @@ const userSlice = createSlice({
         state.status = "idle";
         state.loading = false;
         state.errorMessage = null;
+      })
+      .addCase(updateUserDetails.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.firstName = action.payload.firstName;
+          state.user.lastName = action.payload.lastName;
+          state.user.mobileNo = action.payload.mobileNo;
+          state.status = "succeeded";
+          state.loading = false;
+          state.errorMessage = null;
+        }
       });
   },
 });
 
 export const { setErrorMessage, clearErrors } = userSlice.actions;
 export default userSlice.reducer;
+

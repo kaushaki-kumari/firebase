@@ -15,6 +15,9 @@ const PageStyles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
+  titleClr: {
+    color: "#3182ce",
+  },
   inputContainer: {
     marginBottom: 10,
     width: "100%",
@@ -65,6 +68,11 @@ const PageStyles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 18,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   footer: {
     marginTop: 20,

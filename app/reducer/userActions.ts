@@ -127,3 +127,29 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const updateUserDetails = createAsyncThunk(
+  "user/updateDetails",
+  async (userData: { firstName: string; lastName: string; mobileNo: string; uid: string }, { rejectWithValue }) => {
+    try {
+      const userRef = doc(db, "users", userData.uid);
+      const updatedData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        mobileNo: userData.mobileNo,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await setDoc(userRef, updatedData, { merge: true });
+      return {
+        uid: userData.uid,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        mobileNo: userData.mobileNo,
+      };
+    } catch (error) {
+      return rejectWithValue("Failed to update user details.");
+    }
+  }
+);
+
