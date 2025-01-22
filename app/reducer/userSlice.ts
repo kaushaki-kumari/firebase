@@ -80,6 +80,11 @@ const userSlice = createSlice({
         state.loading = false;
         state.errorMessage = null;
       })
+      .addCase(updateUserDetails.pending, (state) => {
+        state.status = "loading";
+        state.loading = true;
+        state.errorMessage = null;
+      })
       .addCase(updateUserDetails.fulfilled, (state, action) => {
         if (state.user) {
           state.user.firstName = action.payload.firstName;
@@ -89,10 +94,14 @@ const userSlice = createSlice({
           state.loading = false;
           state.errorMessage = null;
         }
+      })
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.loading = false;
+        state.errorMessage = action.payload as string;
       });
   },
 });
 
 export const { setErrorMessage, clearErrors } = userSlice.actions;
 export default userSlice.reducer;
-

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
 import { loginUser } from "../reducer/userActions";
 import { clearErrors } from "../reducer/userSlice";
-import {  RegisterScreenNavigationProp } from "../types/types";
+import { RegisterScreenNavigationProp } from "../types/types";
 import PasswordInput from "../components/PasswordInput";
 import PageStyles from "../styles/PageStyles";
 import { validateEmail } from "../utils/ValidateEmail";
@@ -21,6 +21,7 @@ interface Errors {
   password?: string;
 }
 import SocialIcon from "../components/SocialIcon";
+import App from "../components/twitter";
 
 function Login() {
   const [formData, setFormData] = useState<FormData>({
@@ -53,7 +54,7 @@ function Login() {
 
     const result = await dispatch(loginUser(formData));
     if (loginUser.fulfilled.match(result)) {
-      navigation.navigate("Profile");
+      navigation.navigate("Main");
     }
   };
 
@@ -96,7 +97,11 @@ function Login() {
             setFormData({ ...formData, password: text });
             handleClearErrors();
           }}
-          errorMessage={errors.password !== undefined && errors.password !== "" ? errors.password : ""}
+          errorMessage={
+            errors.password !== undefined && errors.password !== ""
+              ? errors.password
+              : ""
+          }
         />
         {errorMessage !== undefined && errorMessage !== "" && (
           <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
@@ -122,6 +127,7 @@ function Login() {
         </TouchableOpacity>
       </View>
       <SocialIcon />
+      <App />
     </View>
   );
 }
