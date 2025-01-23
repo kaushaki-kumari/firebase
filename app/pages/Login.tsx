@@ -22,6 +22,7 @@ interface Errors {
 }
 import SocialIcon from "../components/SocialIcon";
 import App from "../components/twitter";
+import TwitterPage from "../pages/TwitterPage";
 
 function Login() {
   const [formData, setFormData] = useState<FormData>({
@@ -122,7 +123,7 @@ function Login() {
 
       <View style={PageStyles.footer}>
         <Text style={PageStyles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Twitter")}>
           <Text style={PageStyles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>

@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeScreen from "./Home";
-import AddPostScreen from "./AddPost";
-import ProfileScreen from "./Profile";
+import HomeScreen from "../(tabs)/Home";
+import AddPostScreen from "../(tabs)/AddPost";
+import ProfileScreen from "../pages/Profile";
 import Icon from "react-native-vector-icons/Ionicons";
 
 const Tab = createBottomTabNavigator();

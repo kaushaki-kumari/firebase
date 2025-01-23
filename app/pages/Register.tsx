@@ -186,7 +186,7 @@ const Register = () => {
 
   const handleModalClose = () => {
     setSuccessMessageModalVisible(false);
-    navigation.navigate("Login");
+    navigation.navigate("login");
   };
 
   const pickImage = async (source: "camera" | "gallery") => {
@@ -351,7 +351,7 @@ const Register = () => {
 
         <View style={PageStyles.footer}>
           <Text style={PageStyles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity onPress={() => navigation.navigate("login")}>
             <Text style={PageStyles.footerLink}>Login</Text>
           </TouchableOpacity>
         </View>

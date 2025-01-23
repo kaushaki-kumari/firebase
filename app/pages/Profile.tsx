@@ -24,13 +24,13 @@ function Profile() {
 
   useEffect(() => {
     if (!user) {
-      navigation.navigate("Login");
+      navigation.navigate("login");
     }
   }, [user, navigation]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigation.navigate("Login");
+    navigation.navigate("login");
   };
 
   const handleUpdate = async () => {

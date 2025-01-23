@@ -20,7 +20,7 @@ export default function SocialIcon() {
       return;
     }
     console.log("navigate")
-    navigation.navigate("Profile");
+    navigation.navigate("Main");
     console.log(`${type} login successfully:`, userData);
   } catch (error) {
     console.error(`${type} login error:`, error);
