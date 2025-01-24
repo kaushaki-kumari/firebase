@@ -1,6 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { FacebookAuthProvider, getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import * as Facebook from 'expo-facebook';
+import { AccessToken, LoginManager } from "react-native-fbsdk-next";
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_API_KEY,
@@ -42,3 +44,47 @@ try {
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+export const facebookProvider = new FacebookAuthProvider();
+
+// export const facebookLogin = async () => {
+//   try {
+//     await Facebook.initializeAsync('1342506793432889');
+//     const {
+//       type,
+//       token,
+//     } = await Facebook.logInWithReadPermissionsAsync({
+//       permissions: ["public_profile"],
+//     });
+//     if (type === "success") {
+//       const response = await fetch(
+//         `https://graph.facebook.com/me?access_token=${token}`
+//       );
+//       Alert.alert("Logged in!", `Hi ${(await response.json()).name}!`);
+//     } else {
+//     }
+//   } catch ({ message }) {
+//     alert(`Facebook Login Error: ${message}`);
+//   }
+// }
+
+export const facebookLogin = async () => {
+  try {
+    const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+    
+    if (result.isCancelled) {
+      throw new Error('User cancelled login');
+    }
+    const data = await AccessToken.getCurrentToken();
+    
+    if (!data) {
+      throw new Error('Something went wrong obtaining access token');
+    }
+    const credential = FacebookAuthProvider.credential(data.accessToken);
+    const userCredential = await signInWithCredential(auth, credential);
+    
+    return userCredential.user;
+  } catch (error) {
+    console.error('Facebook Login Error:', error);
+    throw error;
+  }
+};

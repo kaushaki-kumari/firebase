@@ -22,11 +22,11 @@ function Profile() {
   });
   const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    if (!user) {
-      navigation.navigate("login");
-    }
-  }, [user, navigation]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     navigation.navigate("login");
+  //   }
+  // }, [user, navigation]);
 
   const handleLogout = () => {
     dispatch(logoutUser());

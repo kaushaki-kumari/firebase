@@ -5,7 +5,7 @@ export type RootStackParamList = {
   login: undefined;
   Register: undefined;
   Main: undefined;
-  Twitter:undefined;
+  TwitterPage:undefined;
 };
 
 export type RegisterScreenNavigationProp = NativeStackNavigationProp<
