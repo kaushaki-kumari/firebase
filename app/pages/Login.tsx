@@ -21,9 +21,6 @@ interface Errors {
   password?: string;
 }
 import SocialIcon from "../components/SocialIcon";
-import App from "../components/twitter";
-import LoginScreen from "../components/FacebookAuth";
-
 function Login() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -128,8 +125,6 @@ function Login() {
         </TouchableOpacity>
       </View>
       <SocialIcon />
-      <App />
-      <LoginScreen />
     </View>
   );
 }
