@@ -21,8 +21,7 @@ export default function SocialIcon() {
         alert(`${type} login coming soon!`);
         return;
       }
-      console.log("navigate");
-      navigation.navigate("Main");
+      navigation.navigate("main");
       console.log(`${type} login successfully:`, userData);
     } catch (error) {
       console.error(`${type} login error:`, error);

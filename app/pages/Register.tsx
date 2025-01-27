@@ -10,6 +10,7 @@ import {
   ScrollView,
   Alert,
   Platform,
+  ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
@@ -227,143 +228,154 @@ const Register = () => {
 
   return (
     <>
-      <StatusBar style="dark" backgroundColor="#f9fafb" />
-      <ScrollView contentContainerStyle={PageStyles.container}>
-        <Text style={PageStyles.title}>Register Now – Start Your Journey</Text>
+      <ImageBackground
+        source={{
+          uri: "https://www.stockvault.net/data/2019/08/28/268866/preview16.jpg",
+        }}
+        style={PageStyles.background}
+      >
+        <StatusBar style="dark" backgroundColor="#f9fafb" />
+        <ScrollView contentContainerStyle={PageStyles.container}>
+          <Text style={PageStyles.title}>
+            Register Now – Start Your Journey
+          </Text>
 
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>First name</Text>
-          <TextInput
-            placeholder="Enter your first name"
-            value={form.firstName}
-            onChangeText={(text) => handleInputChange("firstName", text)}
-            style={PageStyles.input}
-            autoCapitalize="none"
-          />
-          {errors.firstName && (
-            <Text style={PageStyles.errorMessage}>{errors.firstName}</Text>
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>First name</Text>
+            <TextInput
+              placeholder="Enter your first name"
+              value={form.firstName}
+              onChangeText={(text) => handleInputChange("firstName", text)}
+              style={PageStyles.input}
+              autoCapitalize="none"
+            />
+            {errors.firstName && (
+              <Text style={PageStyles.errorMessage}>{errors.firstName}</Text>
+            )}
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Last name</Text>
+            <TextInput
+              placeholder="Enter your last name"
+              value={form.lastName}
+              onChangeText={(text) => handleInputChange("lastName", text)}
+              style={PageStyles.input}
+              autoCapitalize="none"
+            />
+            {errors.lastName && (
+              <Text style={PageStyles.errorMessage}>{errors.lastName}</Text>
+            )}
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Mobile number</Text>
+            <TextInput
+              placeholder="Enter your mobile number"
+              value={form.mobileNo}
+              onChangeText={(text) => handleInputChange("mobileNo", text)}
+              keyboardType="phone-pad"
+              style={PageStyles.input}
+            />
+            {errors.mobileNo && (
+              <Text style={PageStyles.errorMessage}>{errors.mobileNo}</Text>
+            )}
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Email</Text>
+            <TextInput
+              placeholder="Enter your email"
+              value={form.email}
+              onChangeText={(text) => handleInputChange("email", text)}
+              keyboardType="email-address"
+              style={PageStyles.input}
+              autoCapitalize="none"
+            />
+            {errors.email && (
+              <Text style={PageStyles.errorMessage}>{errors.email}</Text>
+            )}
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Password</Text>
+            <PasswordInput
+              value={form.password}
+              onChangeText={(text) => handleInputChange("password", text)}
+              placeholder="Enter your password"
+              errorMessage={errors.password}
+            />
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Confirm password</Text>
+            <PasswordInput
+              value={form.confirmPassword}
+              onChangeText={(text) =>
+                handleInputChange("confirmPassword", text)
+              }
+              placeholder="Confirm your password"
+              errorMessage={errors.confirmPassword}
+            />
+          </View>
+
+          <View style={PageStyles.inputContainer}>
+            <Text style={PageStyles.label}>Profile image</Text>
+            <View style={styles.imagePickerContainer}>
+              <TouchableOpacity
+                onPress={() => pickImage("gallery")}
+                style={styles.imageContent}
+              >
+                <Ionicons name="image" size={32} color="#3182ce" />
+                <Text style={styles.imagePickerText}>From Gallery</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => pickImage("camera")}
+                style={styles.imageContent}
+              >
+                <Ionicons name="camera" size={32} color="#3182ce" />
+                <Text style={styles.imagePickerText}>From Camera</Text>
+              </TouchableOpacity>
+            </View>
+            {form.image && (
+              <Image source={{ uri: form.image }} style={styles.image} />
+            )}
+            {errors.image && (
+              <Text style={PageStyles.errorMessage}>{errors.image}</Text>
+            )}
+          </View>
+
+          {errorMessage && (
+            <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
           )}
-        </View>
 
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Last name</Text>
-          <TextInput
-            placeholder="Enter your last name"
-            value={form.lastName}
-            onChangeText={(text) => handleInputChange("lastName", text)}
-            style={PageStyles.input}
-            autoCapitalize="none"
-          />
-          {errors.lastName && (
-            <Text style={PageStyles.errorMessage}>{errors.lastName}</Text>
-          )}
-        </View>
+          <TouchableOpacity
+            onPress={handleSignup}
+            style={[PageStyles.button, loading && PageStyles.buttonDisabled]}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={PageStyles.buttonText}>Sign up</Text>
+            )}
+          </TouchableOpacity>
 
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Mobile number</Text>
-          <TextInput
-            placeholder="Enter your mobile number"
-            value={form.mobileNo}
-            onChangeText={(text) => handleInputChange("mobileNo", text)}
-            keyboardType="phone-pad"
-            style={PageStyles.input}
-          />
-          {errors.mobileNo && (
-            <Text style={PageStyles.errorMessage}>{errors.mobileNo}</Text>
-          )}
-        </View>
-
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Email</Text>
-          <TextInput
-            placeholder="Enter your email"
-            value={form.email}
-            onChangeText={(text) => handleInputChange("email", text)}
-            keyboardType="email-address"
-            style={PageStyles.input}
-            autoCapitalize="none"
-          />
-          {errors.email && (
-            <Text style={PageStyles.errorMessage}>{errors.email}</Text>
-          )}
-        </View>
-
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Password</Text>
-          <PasswordInput
-            value={form.password}
-            onChangeText={(text) => handleInputChange("password", text)}
-            placeholder="Enter your password"
-            errorMessage={errors.password}
-          />
-        </View>
-
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Confirm password</Text>
-          <PasswordInput
-            value={form.confirmPassword}
-            onChangeText={(text) => handleInputChange("confirmPassword", text)}
-            placeholder="Confirm your password"
-            errorMessage={errors.confirmPassword}
-          />
-        </View>
-
-        <View style={PageStyles.inputContainer}>
-          <Text style={PageStyles.label}>Profile image</Text>
-          <View style={styles.imagePickerContainer}>
-            <TouchableOpacity
-              onPress={() => pickImage("gallery")}
-              style={styles.imageContent}
-            >
-              <Ionicons name="image" size={32} color="#3182ce" />
-              <Text style={styles.imagePickerText}>From Gallery</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => pickImage("camera")}
-              style={styles.imageContent}
-            >
-              <Ionicons name="camera" size={32} color="#3182ce" />
-              <Text style={styles.imagePickerText}>From Camera</Text>
+          <View style={PageStyles.footer}>
+            <Text style={PageStyles.footerText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate("login")}>
+              <Text style={PageStyles.footerLink}>Login</Text>
             </TouchableOpacity>
           </View>
-          {form.image && (
-            <Image source={{ uri: form.image }} style={styles.image} />
-          )}
-          {errors.image && (
-            <Text style={PageStyles.errorMessage}>{errors.image}</Text>
-          )}
-        </View>
-
-        {errorMessage && (
-          <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
-        )}
-
-        <TouchableOpacity
-          onPress={handleSignup}
-          style={[PageStyles.button, loading && PageStyles.buttonDisabled]}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={PageStyles.buttonText}>Sign up</Text>
-          )}
-        </TouchableOpacity>
-
-        <View style={PageStyles.footer}>
-          <Text style={PageStyles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("login")}>
-            <Text style={PageStyles.footerLink}>Login</Text>
-          </TouchableOpacity>
-        </View>
-        {Platform.OS === "web" && <SocialIcon />}
-        <SuccessMessageModal
-          visible={isSuccessMessageModalVisible}
-          onClose={handleModalClose}
-          message="User registered successfully!"
-          text="Go to Login"
-        />
-      </ScrollView>
+          {Platform.OS === "web" && <SocialIcon />}
+          <SuccessMessageModal
+            visible={isSuccessMessageModalVisible}
+            onClose={handleModalClose}
+            message="User registered successfully!"
+            text="Go to Login"
+          />
+        </ScrollView>
+      </ImageBackground>
     </>
   );
 };

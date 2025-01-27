@@ -7,6 +7,9 @@ import {
   StyleSheet,
   Image,
   ActivityIndicator,
+  ScrollView,
+  ImageBackground,
+  Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,7 +18,6 @@ import { AppDispatch } from "../store/index";
 import { logoutUser, updateUserDetails } from "../reducer/userActions";
 import PageStyles from "../styles/PageStyles";
 import { RegisterScreenNavigationProp } from "../types/types";
-import { ScrollView } from "react-native-gesture-handler";
 import { auth, db } from "../config/firbase.config";
 import { clearUser, setUser } from "../reducer/userSlice";
 import { doc, getDoc } from "firebase/firestore";
@@ -59,6 +61,16 @@ function Profile() {
     return () => unsubscribe();
   }, [dispatch]);
 
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        mobileNo: user.mobileNo || "",
+      });
+    }
+  }, [user]);
+
   const handleLogout = () => {
     dispatch(logoutUser());
     navigation.navigate("login");
@@ -97,99 +109,106 @@ function Profile() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={[PageStyles.title, PageStyles.titleClr]}>My Profile</Text>
-      <View style={styles.profileInfo}>
-        <Image
-          source={{
-            uri: "https://png.pngtree.com/png-clipart/20240521/original/pngtree-a-cute-panda-png-image_15146092.png",
-          }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>{user.firstName || "User"}</Text>
-      </View>
-      <View style={PageStyles.inputContainer}>
-        <Text style={[PageStyles.label, styles.fieldInput]}>First Name</Text>
-        <TextInput
-          style={PageStyles.input}
-          value={formData.firstName}
-          editable={isEditing}
-          onChangeText={(text) =>
-            setFormData((prev) => ({ ...prev, firstName: text }))
-          }
-        />
-      </View>
-      <View style={PageStyles.inputContainer}>
-        <Text style={[PageStyles.label, styles.fieldInput]}>Last Name</Text>
-        <TextInput
-          style={PageStyles.input}
-          value={formData.lastName}
-          editable={isEditing}
-          onChangeText={(text) =>
-            setFormData((prev) => ({ ...prev, lastName: text }))
-          }
-        />
-      </View>
-      <View style={PageStyles.inputContainer}>
-        <Text style={[PageStyles.label, styles.fieldInput]}>Email</Text>
-        <TextInput
-          style={PageStyles.input}
-          value={user.email || "Not Provided"}
-          editable={false}
-        />
-      </View>
-      <View style={PageStyles.inputContainer}>
-        <Text style={[PageStyles.label, styles.fieldInput]}>Mobile Number</Text>
-        <TextInput
-          style={PageStyles.input}
-          value={formData.mobileNo || "Not Provided"}
-          editable={isEditing}
-          maxLength={10}
-          onChangeText={(text) =>
-            setFormData((prev) => ({ ...prev, mobileNo: text }))
-          }
-          keyboardType="phone-pad"
-        />
-        {error ? <Text style={PageStyles.errorMessage}>{error}</Text> : null}
-      </View>
+    <ImageBackground
+      source={{
+        uri: "https://www.stockvault.net/data/2019/08/28/268866/preview16.jpg",
+      }}
+      style={PageStyles.background}
+    >
+      <ScrollView style={styles.container}>
+        <Text style={[PageStyles.title, PageStyles.titleClr]}>My Profile</Text>
+        <View style={styles.profileInfo}>
+          <Image
+            source={{
+              uri: "https://png.pngtree.com/png-clipart/20240521/original/pngtree-a-cute-panda-png-image_15146092.png",
+            }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.name}>{user.firstName || "User"}</Text>
+        </View>
+        <View style={PageStyles.inputContainer}>
+          <Text style={[PageStyles.label, styles.fieldInput]}>First Name</Text>
+          <TextInput
+            style={PageStyles.input}
+            value={formData.firstName}
+            editable={isEditing}
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, firstName: text }))
+            }
+          />
+        </View>
+        <View style={PageStyles.inputContainer}>
+          <Text style={[PageStyles.label, styles.fieldInput]}>Last Name</Text>
+          <TextInput
+            style={PageStyles.input}
+            value={formData.lastName}
+            editable={isEditing}
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, lastName: text }))
+            }
+          />
+        </View>
+        <View style={PageStyles.inputContainer}>
+          <Text style={[PageStyles.label, styles.fieldInput]}>Email</Text>
+          <TextInput
+            style={PageStyles.input}
+            value={user.email || "Not Provided"}
+            editable={false}
+          />
+        </View>
+        <View style={PageStyles.inputContainer}>
+          <Text style={[PageStyles.label, styles.fieldInput]}>
+            Mobile Number
+          </Text>
+          <TextInput
+            style={PageStyles.input}
+            value={formData.mobileNo || ""}
+            editable={isEditing}
+            maxLength={10}
+            onChangeText={(text) =>
+              setFormData((prev) => ({ ...prev, mobileNo: text }))
+            }
+            keyboardType="phone-pad"
+          />
+          {error ? <Text style={PageStyles.errorMessage}>{error}</Text> : null}
+        </View>
 
-      <View style={[PageStyles.inputContainer, styles.viewButton]}>
-        <TouchableOpacity style={styles.button} onPress={handleLogout}>
-          <Text style={PageStyles.buttonText}>Logout</Text>
-        </TouchableOpacity>
-        {isEditing ? (
-          <TouchableOpacity
-            style={[styles.button, loading && PageStyles.buttonDisabled]}
-            onPress={handleUpdate}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={PageStyles.buttonText}>Save</Text>
-            )}
+        <View style={[PageStyles.inputContainer, styles.viewButton]}>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <Text style={PageStyles.buttonText}>Logout</Text>
           </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.button]}
-            onPress={() => setIsEditing(true)}
-          >
-            <Text style={PageStyles.buttonText}>Update</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    </ScrollView>
+          {isEditing ? (
+            <TouchableOpacity
+              style={[styles.button, loading && PageStyles.buttonDisabled]}
+              onPress={handleUpdate}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={PageStyles.buttonText}>Save</Text>
+              )}
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.button]}
+              onPress={() => setIsEditing(true)}
+            >
+              <Text style={PageStyles.buttonText}>Update</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </ScrollView>
+    </ImageBackground>
   );
 }
 
 export default Profile;
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingHorizontal: 20,
-    backgroundColor: "#fff",
-    paddingTop: 40,
+    paddingTop: Platform.OS === "web" ? 50 : 80,
   },
   profileInfo: {
     alignItems: "center",
@@ -224,5 +243,6 @@ const styles = StyleSheet.create({
   fieldInput: {
     marginTop: 10,
     fontSize: 15,
+    // color: "#fff",
   },
 });

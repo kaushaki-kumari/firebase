@@ -3,9 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Register from "./Register";
 
 import TabNavigator from "../(tabs)/_layout";
-import TwitterPage from "./TwitterPage";
 import Login from "./Login";
-
 
 const Stack = createStackNavigator();
 
@@ -13,7 +11,7 @@ const AppNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="login">
           <Stack.Screen
-        name="Register"
+        name="register"
         component={Register}
         options={{
           headerShown: false,
@@ -27,13 +25,8 @@ const AppNavigator = () => {
         component={Login}
         options={{ headerShown: false }}
       />
-      <Stack.Screen 
-      name="Twitter"
-      component={TwitterPage}
-      options={{headerShown:false}}
-      />
       <Stack.Screen
-        name="Main"
+        name="main"
         component={TabNavigator}
         options={{ headerShown: false }}
       />

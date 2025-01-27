@@ -9,9 +9,9 @@ const Tab = createBottomTabNavigator();
 
 const getTabBarIcon = (routeName: string, color: string, size: number) => {
   const iconMap: { [key: string]: string } = {
-    Home: "home-outline",
-    AddPost: "add-circle-outline",
-    Profile: "person-outline",
+    home: "home-outline",
+    addPost: "add-circle-outline",
+    profile: "person-outline",
   };
 
   const iconName = iconMap[routeName] || "alert-circle-outline"; 
@@ -28,9 +28,9 @@ const TabNavigator = () => {
         headerShown: false, 
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="AddPost" component={AddPostScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="home" component={HomeScreen} />
+      <Tab.Screen name="addPost" component={AddPostScreen} />
+      <Tab.Screen name="profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 };

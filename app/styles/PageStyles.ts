@@ -1,16 +1,18 @@
 import { Platform, StyleSheet } from "react-native";
 
 const PageStyles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
   container: {
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingVertical: Platform.OS === "web" ? 20 : 50,
     paddingHorizontal: 20,
-    backgroundColor: "#f9fafb",
   },
   title: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: "bold",
     color: "#2d3748",
     marginBottom: 20,

@@ -7,6 +7,7 @@ import {
   View,
   TextInput,
   Platform,
+  ImageBackground,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
@@ -53,7 +54,7 @@ function Login() {
 
     const result = await dispatch(loginUser(formData));
     if (loginUser.fulfilled.match(result)) {
-      navigation.navigate("Main");
+      navigation.navigate("main");
     }
   };
 
@@ -70,6 +71,12 @@ function Login() {
   };
 
   return (
+    <ImageBackground
+    source={{
+      uri: "https://www.stockvault.net/data/2019/08/28/268866/preview16.jpg",
+    }}
+    style={PageStyles.background}
+  >
     <View style={PageStyles.container}>
       <Text style={PageStyles.title}>Login Your Account</Text>
       <View style={PageStyles.inputContainer}>
@@ -121,12 +128,13 @@ function Login() {
 
       <View style={PageStyles.footer}>
         <Text style={PageStyles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity onPress={() => navigation.navigate("register")}>
           <Text style={PageStyles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
       {Platform.OS === "web" && <SocialIcon />}
     </View>
+    </ImageBackground>
   );
 }
 
