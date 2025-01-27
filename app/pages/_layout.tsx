@@ -12,10 +12,15 @@ const Stack = createStackNavigator();
 const AppNavigator = () => {
   return (
     <Stack.Navigator initialRouteName="login">
-      <Stack.Screen
+          <Stack.Screen
         name="Register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          cardStyle: {
+            flex: 1,
+          },
+        }}
       />
       <Stack.Screen
         name="login"

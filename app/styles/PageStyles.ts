@@ -1,11 +1,12 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const PageStyles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    paddingVertical: Platform.OS === "web" ? 20 : 50,
+    paddingHorizontal: 20,
     backgroundColor: "#f9fafb",
   },
   title: {

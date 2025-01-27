@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Image, ActivityIndicator } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/index";
@@ -7,13 +15,16 @@ import { AppDispatch } from "../store/index";
 import { logoutUser, updateUserDetails } from "../reducer/userActions";
 import PageStyles from "../styles/PageStyles";
 import { RegisterScreenNavigationProp } from "../types/types";
+import { ScrollView } from "react-native-gesture-handler";
+import { auth, db } from "../config/firbase.config";
+import { clearUser, setUser } from "../reducer/userSlice";
+import { doc, getDoc } from "firebase/firestore";
 
 function Profile() {
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const user = useSelector((state: RootState) => state.user.user);
   const loading = useSelector((state: RootState) => state.user.loading);
-
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.firstName || "",
@@ -23,10 +34,30 @@ function Profile() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    if (!user) {
-      navigation.navigate("login");
-    }
-  }, [user, navigation]);
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+      if (firebaseUser) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const userDetails = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              firstName: userData.firstName || "",
+              lastName: userData.lastName || "",
+              mobileNo: userData.mobileNo || "",
+            };
+            dispatch(setUser(userDetails));
+          }
+        } catch (error) {
+          console.error("Error fetching user data from Firestore:", error);
+        }
+      } else {
+        dispatch(clearUser());
+      }
+    });
+    return () => unsubscribe();
+  }, [dispatch]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -40,7 +71,7 @@ function Profile() {
     }
     const mobileNoRegex = /^\d{10}$/;
     if (!mobileNoRegex.test(formData.mobileNo)) {
-      setError("Mobile number must be 10 ");
+      setError("Mobile number must be 10 digits");
       return;
     }
 
@@ -62,62 +93,73 @@ function Profile() {
   };
 
   if (!user) {
-    return null;
+    return <ActivityIndicator size="large" color="#0000ff" />;
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={[PageStyles.title, PageStyles.titleClr]}>My Profile</Text>
       <View style={styles.profileInfo}>
         <Image
-          source={{ uri: 'https://png.pngtree.com/png-clipart/20240521/original/pngtree-a-cute-panda-png-image_15146092.png' }}
+          source={{
+            uri: "https://png.pngtree.com/png-clipart/20240521/original/pngtree-a-cute-panda-png-image_15146092.png",
+          }}
           style={styles.profileImage}
         />
         <Text style={styles.name}>{user.firstName || "User"}</Text>
       </View>
+      <View style={PageStyles.inputContainer}>
+        <Text style={[PageStyles.label, styles.fieldInput]}>First Name</Text>
+        <TextInput
+          style={PageStyles.input}
+          value={formData.firstName}
+          editable={isEditing}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, firstName: text }))
+          }
+        />
+      </View>
+      <View style={PageStyles.inputContainer}>
+        <Text style={[PageStyles.label, styles.fieldInput]}>Last Name</Text>
+        <TextInput
+          style={PageStyles.input}
+          value={formData.lastName}
+          editable={isEditing}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, lastName: text }))
+          }
+        />
+      </View>
+      <View style={PageStyles.inputContainer}>
+        <Text style={[PageStyles.label, styles.fieldInput]}>Email</Text>
+        <TextInput
+          style={PageStyles.input}
+          value={user.email || "Not Provided"}
+          editable={false}
+        />
+      </View>
+      <View style={PageStyles.inputContainer}>
+        <Text style={[PageStyles.label, styles.fieldInput]}>Mobile Number</Text>
+        <TextInput
+          style={PageStyles.input}
+          value={formData.mobileNo || "Not Provided"}
+          editable={isEditing}
+          maxLength={10}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, mobileNo: text }))
+          }
+          keyboardType="phone-pad"
+        />
+        {error ? <Text style={PageStyles.errorMessage}>{error}</Text> : null}
+      </View>
 
-      <Text style={[PageStyles.label, styles.fieldInput]}>First Name</Text>
-      <TextInput
-        style={PageStyles.input}
-        value={formData.firstName}
-        editable={isEditing}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, firstName: text }))}
-      />
-
-      <Text style={[PageStyles.label, styles.fieldInput]}>Last Name</Text>
-      <TextInput
-        style={PageStyles.input}
-        value={formData.lastName}
-        editable={isEditing}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, lastName: text }))}
-      />
-
-      <Text style={[PageStyles.label, styles.fieldInput]}>Email</Text>
-      <TextInput
-        style={PageStyles.input}
-        value={user.email}
-        editable={false}
-      />
-
-      <Text style={[PageStyles.label, styles.fieldInput]}>Mobile Number</Text>
-      <TextInput
-        style={PageStyles.input}
-        value={formData.mobileNo}
-        editable={isEditing}
-        onChangeText={(text) => setFormData((prev) => ({ ...prev, mobileNo: text }))}
-        keyboardType="phone-pad"
-      />
-
-      {error ? <Text style={PageStyles.errorMessage}>{error}</Text> : null}
-
-      <View style={styles.viewButton}>
+      <View style={[PageStyles.inputContainer, styles.viewButton]}>
         <TouchableOpacity style={styles.button} onPress={handleLogout}>
           <Text style={PageStyles.buttonText}>Logout</Text>
         </TouchableOpacity>
-
         {isEditing ? (
           <TouchableOpacity
-            style={[styles.button,loading && PageStyles.buttonDisabled]}
+            style={[styles.button, loading && PageStyles.buttonDisabled]}
             onPress={handleUpdate}
             disabled={loading}
           >
@@ -136,7 +178,7 @@ function Profile() {
           </TouchableOpacity>
         )}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -144,13 +186,13 @@ export default Profile;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
+    flexGrow: 1,
+    paddingHorizontal: 20,
     backgroundColor: "#fff",
+    paddingTop: 40,
   },
   profileInfo: {
     alignItems: "center",
-    marginBottom: 20,
   },
   profileImage: {
     width: 100,
@@ -180,7 +222,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   fieldInput: {
-    marginTop: 20,
+    marginTop: 10,
     fontSize: 15,
   },
 });

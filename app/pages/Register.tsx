@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Alert,
+  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
@@ -355,7 +356,7 @@ const Register = () => {
             <Text style={PageStyles.footerLink}>Login</Text>
           </TouchableOpacity>
         </View>
-        <SocialIcon />
+        {Platform.OS === "web" && <SocialIcon />}
         <SuccessMessageModal
           visible={isSuccessMessageModalVisible}
           onClose={handleModalClose}
