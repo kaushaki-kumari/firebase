@@ -28,7 +28,7 @@ import { userState } from "../utils/userData";
 import PageStyles from "../styles/PageStyles";
 import { RegisterScreenNavigationProp } from "../types/types";
 import { validateEmail } from "../utils/ValidateEmail";
-import SocialIcon from "../components/SocialIcon";
+import SocialIcon from "../components/SocialAuth";
 
 const Register = () => {
   const dispatch = useDispatch();

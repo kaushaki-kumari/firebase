@@ -15,12 +15,13 @@ import { useNavigation } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../store/index";
 import { AppDispatch } from "../store/index";
-import { logoutUser, updateUserDetails } from "../reducer/userActions";
+import {
+  fetchUserData,
+  logoutUser,
+  updateUserDetails,
+} from "../reducer/userActions";
 import PageStyles from "../styles/PageStyles";
 import { RegisterScreenNavigationProp } from "../types/types";
-import { auth, db } from "../config/firbase.config";
-import { clearUser, setUser } from "../reducer/userSlice";
-import { doc, getDoc } from "firebase/firestore";
 
 function Profile() {
   const dispatch = useDispatch<AppDispatch>();
@@ -36,29 +37,7 @@ function Profile() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
-      if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const userDetails = {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              firstName: userData.firstName || "",
-              lastName: userData.lastName || "",
-              mobileNo: userData.mobileNo || "",
-            };
-            dispatch(setUser(userDetails));
-          }
-        } catch (error) {
-          console.error("Error fetching user data from Firestore:", error);
-        }
-      } else {
-        dispatch(clearUser());
-      }
-    });
-    return () => unsubscribe();
+    dispatch(fetchUserData());
   }, [dispatch]);
 
   useEffect(() => {

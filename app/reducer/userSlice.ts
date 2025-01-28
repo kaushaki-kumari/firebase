@@ -4,14 +4,15 @@ import {
   registerUser,
   logoutUser,
   updateUserDetails,
+  fetchUserData,
 } from "./userActions";
 
 interface UserDetails {
   uid: string;
-  email: string | null; 
-  firstName: string | null; 
+  email: string | null;
+  firstName: string | null;
   lastName: string | null;
-  mobileNo: string | null; 
+  mobileNo: string | null;
 }
 
 interface UserState {
@@ -35,7 +36,7 @@ const userSlice = createSlice({
     setUser: (state, action: PayloadAction<UserDetails | null>) => {
       state.user = action.payload;
     },
-    clearUser: (state) => {  
+    clearUser: (state) => {
       state.user = null;
     },
     setErrorMessage: (state, action: PayloadAction<string | null>) => {
@@ -110,9 +111,20 @@ const userSlice = createSlice({
         state.status = "failed";
         state.loading = false;
         state.errorMessage = action.payload as string;
+      })
+      .addCase(fetchUserData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.loading = false;
       });
   },
 });
 
-export const { setUser, setErrorMessage, clearErrors ,clearUser} = userSlice.actions;
+export const { setUser, setErrorMessage, clearErrors, clearUser } =
+  userSlice.actions;
 export default userSlice.reducer;

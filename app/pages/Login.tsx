@@ -22,7 +22,7 @@ interface Errors {
   email?: string;
   password?: string;
 }
-import SocialIcon from "../components/SocialIcon";
+import SocialIcon from "../components/SocialAuth";
 function Login() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
