@@ -1,19 +1,25 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 const PageStyles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
+  },
+  container: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f9fafb",
+    paddingVertical: Platform.OS === "web" ? 20 : 50,
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: "bold",
     color: "#2d3748",
     marginBottom: 20,
     textAlign: "center",
+  },
+  titleClr: {
+    color: "#3182ce",
   },
   inputContainer: {
     marginBottom: 10,
@@ -65,6 +71,11 @@ const PageStyles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 18,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   footer: {
     marginTop: 20,

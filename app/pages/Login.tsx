@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   View,
   TextInput,
+  Platform,
+  ImageBackground,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../store";
@@ -20,7 +22,7 @@ interface Errors {
   email?: string;
   password?: string;
 }
-
+import SocialIcon from "../components/SocialAuth";
 function Login() {
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -52,7 +54,7 @@ function Login() {
 
     const result = await dispatch(loginUser(formData));
     if (loginUser.fulfilled.match(result)) {
-      navigation.navigate("Profile");
+      navigation.navigate("main");
     }
   };
 
@@ -69,6 +71,12 @@ function Login() {
   };
 
   return (
+    <ImageBackground
+    source={{
+      uri: "https://www.stockvault.net/data/2019/08/28/268866/preview16.jpg",
+    }}
+    style={PageStyles.background}
+  >
     <View style={PageStyles.container}>
       <Text style={PageStyles.title}>Login Your Account</Text>
       <View style={PageStyles.inputContainer}>
@@ -95,7 +103,11 @@ function Login() {
             setFormData({ ...formData, password: text });
             handleClearErrors();
           }}
-          errorMessage={errors.password !== undefined && errors.password !== "" ? errors.password : ""}
+          errorMessage={
+            errors.password !== undefined && errors.password !== ""
+              ? errors.password
+              : ""
+          }
         />
         {errorMessage !== undefined && errorMessage !== "" && (
           <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
@@ -116,11 +128,13 @@ function Login() {
 
       <View style={PageStyles.footer}>
         <Text style={PageStyles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+        <TouchableOpacity onPress={() => navigation.navigate("register")}>
           <Text style={PageStyles.footerLink}>Sign up</Text>
         </TouchableOpacity>
       </View>
+      {Platform.OS === "web" && <SocialIcon />}
     </View>
+    </ImageBackground>
   );
 }
 

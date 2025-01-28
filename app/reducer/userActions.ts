@@ -127,3 +127,63 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
+
+export const updateUserDetails = createAsyncThunk(
+  "user/updateDetails",
+  async (
+    userData: {
+      firstName: string;
+      lastName: string;
+      mobileNo: string;
+      uid: string;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const userRef = doc(db, "users", userData.uid);
+      const updatedData = {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        mobileNo: userData.mobileNo,
+        updatedAt: new Date().toISOString(),
+      };
+
+      await setDoc(userRef, updatedData, { merge: true });
+      return {
+        uid: userData.uid,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        mobileNo: userData.mobileNo,
+      };
+    } catch (error) {
+      return rejectWithValue("Failed to update user details.");
+    }
+  }
+);
+
+export const fetchUserData = createAsyncThunk(
+  "user/fetchUserData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        return rejectWithValue("No authenticated user found.");
+      }
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        return rejectWithValue("User data not found in Firestore.");
+      }
+
+      const userData = userDoc.data();
+      return {
+        uid: user.uid,
+        email: user.email || "",
+        firstName: userData.firstName || "",
+        lastName: userData.lastName || "",
+        mobileNo: userData.mobileNo || "",
+      };
+    } catch (error) {
+      return rejectWithValue("Failed to fetch user data.");
+    }
+  }
+);

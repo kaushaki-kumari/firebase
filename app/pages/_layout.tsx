@@ -1,27 +1,33 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import Register from "./Register";
+
+import TabNavigator from "../(tabs)/_layout";
 import Login from "./Login";
-import Profile from "./Profile";
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen
-        name="Register"
+    <Stack.Navigator initialRouteName="login">
+          <Stack.Screen
+        name="register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          cardStyle: {
+            flex: 1,
+          },
+        }}
       />
       <Stack.Screen
-        name="Login"
+        name="login"
         component={Login}
         options={{ headerShown: false }}
       />
       <Stack.Screen
-        name="Profile"
-        component={Profile}
+        name="main"
+        component={TabNavigator}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

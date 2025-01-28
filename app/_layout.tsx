@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import store from "./store";
-import AppNavigator from "./pages/AppNavigator";
+import AppNavigator from "./pages/_layout"
 
 const Index = () => {
   return (
@@ -10,5 +10,4 @@ const Index = () => {
     </Provider>
   );
 };
-
 export default Index;

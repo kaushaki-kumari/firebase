@@ -1,12 +1,18 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { loginUser, registerUser, logoutUser } from "./userActions";
+import {
+  loginUser,
+  registerUser,
+  logoutUser,
+  updateUserDetails,
+  fetchUserData,
+} from "./userActions";
 
 interface UserDetails {
   uid: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  mobileNo: string;
+  email: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  mobileNo: string | null;
 }
 
 interface UserState {
@@ -27,6 +33,12 @@ const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
+    setUser: (state, action: PayloadAction<UserDetails | null>) => {
+      state.user = action.payload;
+    },
+    clearUser: (state) => {
+      state.user = null;
+    },
     setErrorMessage: (state, action: PayloadAction<string | null>) => {
       state.errorMessage = action.payload;
     },
@@ -79,9 +91,40 @@ const userSlice = createSlice({
         state.status = "idle";
         state.loading = false;
         state.errorMessage = null;
+      })
+      .addCase(updateUserDetails.pending, (state) => {
+        state.status = "loading";
+        state.loading = true;
+        state.errorMessage = null;
+      })
+      .addCase(updateUserDetails.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user.firstName = action.payload.firstName;
+          state.user.lastName = action.payload.lastName;
+          state.user.mobileNo = action.payload.mobileNo;
+          state.status = "succeeded";
+          state.loading = false;
+          state.errorMessage = null;
+        }
+      })
+      .addCase(updateUserDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.loading = false;
+        state.errorMessage = action.payload as string;
+      })
+      .addCase(fetchUserData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchUserData.rejected, (state, action) => {
+        state.loading = false;
       });
   },
 });
 
-export const { setErrorMessage, clearErrors } = userSlice.actions;
+export const { setUser, setErrorMessage, clearErrors, clearUser } =
+  userSlice.actions;
 export default userSlice.reducer;
