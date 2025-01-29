@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firbase.config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface RegisterUserPayload {
   firstName: string;
@@ -81,6 +82,42 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// export const loginUser = createAsyncThunk(
+//   "user/login",
+//   async (credentials: LoginUserPayload, { rejectWithValue }) => {
+//     try {
+//       const userCredential = await signInWithEmailAndPassword(
+//         auth,
+//         credentials.email,
+//         credentials.password
+//       );
+
+//       const userRef = doc(db, "users", userCredential.user.uid);
+//       const userDoc = await getDoc(userRef);
+
+//       if (!userDoc.exists()) {
+//         throw new Error("User data not found");
+//       }
+
+//       const userData = userDoc.data();
+//       return {
+//         uid: userCredential.user.uid,
+//         email: userData.email,
+//         firstName: userData.firstName,
+//         lastName: userData.lastName,
+//         mobileNo: userData.mobileNo,
+//       };
+//     } catch (error) {
+//       if (error instanceof Error) {
+//         const firebaseError = error as AuthError;
+//         return rejectWithValue(handleFirebaseError(firebaseError));
+//       }
+//       return rejectWithValue("An unexpected error occurred.");
+//     }
+//   }
+// );
+
+
 export const loginUser = createAsyncThunk(
   "user/login",
   async (credentials: LoginUserPayload, { rejectWithValue }) => {
@@ -99,13 +136,16 @@ export const loginUser = createAsyncThunk(
       }
 
       const userData = userDoc.data();
-      return {
+      const userInfo = {
         uid: userCredential.user.uid,
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
         mobileNo: userData.mobileNo,
       };
+      await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+
+      return userInfo;
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as AuthError;
@@ -115,7 +155,6 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
-
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {

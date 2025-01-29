@@ -1,9 +1,10 @@
-import { 
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
   GoogleAuthProvider,
   signInWithPopup,
   TwitterAuthProvider,
+  FacebookAuthProvider,
   User as FirebaseUser,
-  FacebookAuthProvider
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firbase.config";
@@ -21,17 +22,20 @@ interface UserData {
 
 const storeUserData = async (user: FirebaseUser): Promise<UserData> => {
   const userRef = doc(db, "users", user.uid);
-  const userDoc = await getDoc(userRef);  
+  const userDoc = await getDoc(userRef);
   const now = new Date().toISOString();
-  
+
   let userData: UserData;
   if (userDoc.exists()) {
     const existingData = userDoc.data() as UserData;
     userData = {
       ...existingData,
       email: user.email || existingData.email || "no email",
-      providerId: user.providerData[0]?.providerId ?? existingData.providerId ?? "unknown",
-      updatedAt: now
+      providerId:
+        user.providerData[0]?.providerId ??
+        existingData.providerId ??
+        "unknown",
+      updatedAt: now,
     };
   } else {
     userData = {
@@ -42,9 +46,10 @@ const storeUserData = async (user: FirebaseUser): Promise<UserData> => {
       mobileNo: user.phoneNumber ?? null,
       providerId: user.providerData[0]?.providerId ?? "unknown",
       createdAt: now,
-      updatedAt: now
+      updatedAt: now,
     };
   }
+  await AsyncStorage.setItem("user", JSON.stringify(userData));
 
   await setDoc(userRef, userData, { merge: true });
   return userData;
