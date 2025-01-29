@@ -3,20 +3,74 @@ import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
+  TextInput,
   TouchableOpacity,
+  ImageBackground,
+  ScrollView,
+  ActivityIndicator,
 } from "react-native";
+import { WebView, WebViewMessageEvent } from "react-native-webview";
+import { useDispatch, useSelector } from "react-redux";
+import { addPost } from "../reducer/PostSlice";
 import PageStyles from "../styles/PageStyles";
-import { TextInput } from "react-native-gesture-handler";
-import { RichEditor, RichToolbar } from "react-native-pell-rich-editor";
+import { AppDispatch } from "../store";
 
 const AddPost = () => {
-  const [plainText, setPlainText] = useState("");
-  const [editorState, setEditorState] = useState('');
-  const richText = useRef(null);
+  const webViewRef = useRef<WebView | null>(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    photo: "",
+    slug: "",
+    description: "",
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading } = useSelector((state: any) => state.posts);
+
+  const handleEditorMessage = (event: WebViewMessageEvent) => {
+    setFormData({ ...formData, description: event.nativeEvent.data });
+  };
+
+  const resetEditor = () => {
+    if (webViewRef.current) {
+      webViewRef.current.injectJavaScript(
+        `CKEDITOR.instances.editor.setData('');`
+      );
+    }
+  };
 
   const handleAddPost = () => {
-    console.log("Add Post button pressed");
+    setErrorMessage("");
+    if (
+      !formData.title ||
+      !formData.photo ||
+      !formData.slug ||
+      !formData.description
+    ) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+    const generatedSlug = generateSlug(formData.title, formData.slug);
+    const postData = { ...formData, slug: generatedSlug };
+
+    dispatch(addPost(postData))
+      .unwrap()
+      .then(() => {
+        setErrorMessage("");
+        setFormData({ title: "", photo: "", slug: "", description: "" });
+        resetEditor();
+      })
+      .catch((error: string) => setErrorMessage(error));
+  };
+
+  const generateSlug = (title: string, slugFromFormData: string) => {
+    const slugBase = title
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
+    const uniqueId = Date.now();
+    return `${slugBase}-${uniqueId}-${slugFromFormData}`;
   };
 
   return (
@@ -26,99 +80,100 @@ const AddPost = () => {
       }}
       style={PageStyles.background}
     >
-      <View style={styles.container}>
-        <Text style={PageStyles.title}>Create a New Post</Text>
-
+      <ScrollView style={styles.container}>
+        <Text style={[PageStyles.title, PageStyles.titleClr]}>
+          Create New Post
+        </Text>
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Title</Text>
-          <TextInput style={PageStyles.input} placeholder="Title" />
+          <TextInput
+            style={PageStyles.input}
+            placeholder="Title"
+            value={formData.title}
+            onChangeText={(text) => setFormData({ ...formData, title: text })}
+          />
         </View>
-
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Photo URL</Text>
-          <TextInput style={PageStyles.input} placeholder="Photo URL" />
+          <TextInput
+            style={PageStyles.input}
+            placeholder="Photo URL"
+            value={formData.photo}
+            onChangeText={(text) => setFormData({ ...formData, photo: text })}
+          />
         </View>
-
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Slug</Text>
-          <TextInput style={PageStyles.input} placeholder="Slug" />
+          <TextInput
+            style={PageStyles.input}
+            placeholder="Slug"
+            value={formData.slug}
+            onChangeText={(text) => setFormData({ ...formData, slug: text })}
+          />
         </View>
-
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Description</Text>
-          <RichEditor
-            ref={richText}
-            style={styles.richEditor}
-            placeholder="Write your description here..."
-            onChange={setEditorState}
-          />
-          <RichToolbar editor={richText} />
+          <View style={styles.webviewContainer}>
+            <WebView
+              ref={webViewRef}
+              originWhitelist={["*"]}
+              source={{ html: editorHTML }}
+              javaScriptEnabled
+              onMessage={handleEditorMessage}
+            />
+          </View>
         </View>
-
         <TouchableOpacity
-          style={[PageStyles.button, styles.button]}
+          style={[PageStyles.button, loading && PageStyles.buttonDisabled]}
           onPress={handleAddPost}
         >
-          <Text style={PageStyles.buttonText}>Add Post</Text>
+          {loading ? (
+            <ActivityIndicator size="small" color="#ffffff" />
+          ) : (
+            <Text style={PageStyles.buttonText}>Add Post</Text>
+          )}
         </TouchableOpacity>
-      </View>
+        {errorMessage ? (
+          <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
+        ) : null}
+      </ScrollView>
     </ImageBackground>
   );
 };
 
+const editorHTML = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+  </head>
+  <body>
+      <textarea id="editor"></textarea>
+      <script>
+          CKEDITOR.replace('editor');
+          CKEDITOR.instances.editor.on('change', function() {
+              window.ReactNativeWebView.postMessage(CKEDITOR.instances.editor.getData());
+          });
+      </script>
+  </body>
+  </html>
+`;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 20,
-    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
-  richEditor: {
+  webviewContainer: {
+    height: 300,
     borderWidth: 1,
-    borderColor: "#ddd",
-    minHeight: 200,
-    marginTop: 10,
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
-  button: {
-    maxWidth: 200,
-    marginTop: 20,
+    borderColor: "#e2e8f0",
+    borderRadius: 10,
+    overflow: "hidden",
   },
 });
+
 export default AddPost;
-
-// import React from "react";
-// import { Text, Platform, KeyboardAvoidingView, SafeAreaView, ScrollView } from "react-native";
-// import { actions, RichEditor, RichToolbar } from "react-native-pell-rich-editor";
-
-// const handleHead = ({ tintColor }: { tintColor: string }) => <Text style={{ color: tintColor }}>H1</Text>;
-
-// const AddPost = () => {
-//   const richText = React.useRef<RichEditor | null>(null);
-
-//   return (
-//     <SafeAreaView>
-//       <ScrollView>
-//         <KeyboardAvoidingView behavior={Platform.OS === "android" ? "padding" : "height"} style={{ flex: 1 }}>
-//           <Text>Description:</Text>
-//           <RichEditor
-//             ref={richText} 
-//             onChange={descriptionText => {
-//               console.log("descriptionText:", descriptionText);
-//             }}
-//           />
-//         </KeyboardAvoidingView>
-//       </ScrollView>
-
-//       <RichToolbar
-//         editor={richText}
-//         actions={[actions.setBold, actions.setItalic, actions.setUnderline, actions.heading1]}
-//         iconMap={{ [actions.heading1]: handleHead }}
-//       />
-//     </SafeAreaView>
-//   );
-// };
-
-// export default AddPost;
-

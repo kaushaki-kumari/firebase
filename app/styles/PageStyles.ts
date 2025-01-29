@@ -29,7 +29,7 @@ const PageStyles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "bold",
     color: "#4a5568",
     marginBottom: 6,
   },
