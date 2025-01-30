@@ -22,6 +22,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
 import { RegisterScreenNavigationProp } from "../types/types";
+import Toast from "toastify-react-native";
 
 const AddPost = () => {
   const webViewRef = useRef<WebView | null>(null);
@@ -38,12 +39,11 @@ const AddPost = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { loading } = useSelector((state: any) => state.posts);
 
-
   // const resetEditor = () => {
   //   // if (_editor.current) {
-  
-  //   //   _editor.current.setContents([{ insert: '\n' }]); 
-  //   //   setDescription(""); 
+
+  //   //   _editor.current.setContents([{ insert: '\n' }]);
+  //   //   setDescription("");
   //   // }
   //   // if (webViewRef.current) {
   //   //   webViewRef.current.injectJavaScript(
@@ -66,13 +66,13 @@ const AddPost = () => {
   // };
 
   const resetEditor = () => {
-    console.log(_editor)
+    // console.log(_editor);
     if (_editor.current) {
       console.log("Resetting editor...");
-      _editor.current.setContents([{ insert: '\n' }]);
+      _editor.current.setContents([{ insert: "\n" }]);
     }
     console.log("Resetting description state...");
-    setDescription(""); 
+    setDescription("");
   };
 
   const pickImage = async (source: "camera" | "gallery") => {
@@ -117,14 +117,15 @@ const AddPost = () => {
       .unwrap()
       .then(() => {
         setErrorMessage("");
-        setFormData({ title: "", photo: "", slug: "",});
+        setFormData({ title: "", photo: "", slug: "" });
         setDescription("");
-        resetEditor();
         navigation.navigate("home");
+        Toast.info("Post added successfully!");
       })
-      .catch((error: string) => setErrorMessage(error));
-  };
 
+      .catch((error: string) => setErrorMessage(error));
+    resetEditor();
+  };
   const generateSlug = (title: string, slugFromFormData: string) => {
     const slugBase = title
       .toLowerCase()
@@ -142,7 +143,7 @@ const AddPost = () => {
       }}
       style={PageStyles.background}
     >
-      <ScrollView contentContainerStyle={styles.container }>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={[PageStyles.title, PageStyles.titleClr]}>
           Create New Post
         </Text>
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    alignItems:'center'
+    alignItems: "center",
   },
   webviewContainer: {
     height: 300,
