@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firbase.config";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface RegisterUserPayload {
   firstName: string;
@@ -99,13 +100,16 @@ export const loginUser = createAsyncThunk(
       }
 
       const userData = userDoc.data();
-      return {
+      const userInfo = {
         uid: userCredential.user.uid,
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
         mobileNo: userData.mobileNo,
       };
+      await AsyncStorage.setItem("user", JSON.stringify(userInfo));
+
+      return userInfo;
     } catch (error) {
       if (error instanceof Error) {
         const firebaseError = error as AuthError;
@@ -115,12 +119,12 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
-
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
     try {
       await signOut(auth);
+      await AsyncStorage.removeItem("user");
       return null;
     } catch (error) {
       return rejectWithValue("Failed to logout. Please try again.");
@@ -163,27 +167,16 @@ export const updateUserDetails = createAsyncThunk(
 
 export const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        return rejectWithValue("No authenticated user found.");
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        return JSON.parse(storedUser);
       }
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists()) {
-        return rejectWithValue("User data not found in Firestore.");
-      }
-
-      const userData = userDoc.data();
-      return {
-        uid: user.uid,
-        email: user.email || "",
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        mobileNo: userData.mobileNo || "",
-      };
+      return null;
     } catch (error) {
-      return rejectWithValue("Failed to fetch user data.");
+      console.error("Failed to fetch user data:", error);
+      return null;
     }
   }
 );

@@ -321,24 +321,24 @@ const Register = () => {
 
           <View style={PageStyles.inputContainer}>
             <Text style={PageStyles.label}>Profile image</Text>
-            <View style={styles.imagePickerContainer}>
+            <View style={PageStyles.imagePickerContainer}>
               <TouchableOpacity
                 onPress={() => pickImage("gallery")}
-                style={styles.imageContent}
+                style={PageStyles.imageContent}
               >
                 <Ionicons name="image" size={32} color="#3182ce" />
-                <Text style={styles.imagePickerText}>From Gallery</Text>
+                <Text style={PageStyles.imagePickerText}>From Gallery</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => pickImage("camera")}
-                style={styles.imageContent}
+                style={PageStyles.imageContent}
               >
                 <Ionicons name="camera" size={32} color="#3182ce" />
-                <Text style={styles.imagePickerText}>From Camera</Text>
+                <Text style={PageStyles.imagePickerText}>From Camera</Text>
               </TouchableOpacity>
             </View>
             {form.image && (
-              <Image source={{ uri: form.image }} style={styles.image} />
+              <Image source={{ uri: form.image }} style={PageStyles.image} />
             )}
             {errors.image && (
               <Text style={PageStyles.errorMessage}>{errors.image}</Text>
@@ -379,35 +379,5 @@ const Register = () => {
     </>
   );
 };
-
-const styles = StyleSheet.create({
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    resizeMode: "cover",
-    marginTop: 8,
-  },
-  imagePickerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "white",
-    padding: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  imagePickerText: {
-    marginLeft: 10,
-    fontSize: 15,
-    marginTop: 5,
-    color: "#3182ce",
-    fontWeight: "500",
-  },
-  imageContent: {
-    display: "flex",
-    flexDirection: "row",
-  },
-});
 
 export default Register;
