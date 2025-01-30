@@ -20,6 +20,8 @@ import PageStyles from "../styles/PageStyles";
 import { AppDispatch } from "../store";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
+import { RegisterScreenNavigationProp } from "../types/types";
 
 const AddPost = () => {
   const webViewRef = useRef<WebView | null>(null);
@@ -33,14 +35,44 @@ const AddPost = () => {
   const [description, setDescription] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch<AppDispatch>();
+  const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { loading } = useSelector((state: any) => state.posts);
 
+
+  // const resetEditor = () => {
+  //   // if (_editor.current) {
+  
+  //   //   _editor.current.setContents([{ insert: '\n' }]); 
+  //   //   setDescription(""); 
+  //   // }
+  //   // if (webViewRef.current) {
+  //   //   webViewRef.current.injectJavaScript(
+  //   //     `CKEDITOR.instances.editor.setData('');`
+  //   //   );
+  //   // }
+  //   // if (_editor.current) {
+  //   //   // Reset the Quill editor's content to just a new line
+  //   //   console.log('1111111111111111111111r')
+  //   //   _editor.current.setContents([{ insert: '\n' }]);
+  //   // }
+  //   if (webViewRef.current) {
+  //     webViewRef.current.injectJavaScript(`
+  //       if (CKEDITOR.instances.editor) {
+  //         CKEDITOR.instances.editor.setData('');
+  //       }
+  //     `);
+  //     setDescription("");  // Clear the description in state as well
+  //   }
+  // };
+
   const resetEditor = () => {
-    if (webViewRef.current) {
-      webViewRef.current.injectJavaScript(
-        `CKEDITOR.instances.editor.setData('');`
-      );
+    console.log(_editor)
+    if (_editor.current) {
+      console.log("Resetting editor...");
+      _editor.current.setContents([{ insert: '\n' }]);
     }
+    console.log("Resetting description state...");
+    setDescription(""); 
   };
 
   const pickImage = async (source: "camera" | "gallery") => {
@@ -85,9 +117,10 @@ const AddPost = () => {
       .unwrap()
       .then(() => {
         setErrorMessage("");
-        setFormData({ title: "", photo: "", slug: "" });
+        setFormData({ title: "", photo: "", slug: "",});
         setDescription("");
         resetEditor();
+        navigation.navigate("home");
       })
       .catch((error: string) => setErrorMessage(error));
   };
@@ -109,7 +142,7 @@ const AddPost = () => {
       }}
       style={PageStyles.background}
     >
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container }>
         <Text style={[PageStyles.title, PageStyles.titleClr]}>
           Create New Post
         </Text>
@@ -121,7 +154,7 @@ const AddPost = () => {
             value={formData.title}
             onChangeText={(text) => setFormData({ ...formData, title: text })}
           />
-        </View>{" "}
+        </View>
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Profile image</Text>
           <View style={PageStyles.imagePickerContainer}>
@@ -209,9 +242,10 @@ const AddPost = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingVertical: 10,
+    alignItems:'center'
   },
   webviewContainer: {
     height: 300,

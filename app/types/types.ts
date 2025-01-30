@@ -4,9 +4,10 @@ export type RootStackParamList = {
   login: undefined;
   register: undefined;
   main: undefined;
+  home:undefined
 };
 
 export type RegisterScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "login"
+  "main"
 >;
