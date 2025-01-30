@@ -82,42 +82,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// export const loginUser = createAsyncThunk(
-//   "user/login",
-//   async (credentials: LoginUserPayload, { rejectWithValue }) => {
-//     try {
-//       const userCredential = await signInWithEmailAndPassword(
-//         auth,
-//         credentials.email,
-//         credentials.password
-//       );
-
-//       const userRef = doc(db, "users", userCredential.user.uid);
-//       const userDoc = await getDoc(userRef);
-
-//       if (!userDoc.exists()) {
-//         throw new Error("User data not found");
-//       }
-
-//       const userData = userDoc.data();
-//       return {
-//         uid: userCredential.user.uid,
-//         email: userData.email,
-//         firstName: userData.firstName,
-//         lastName: userData.lastName,
-//         mobileNo: userData.mobileNo,
-//       };
-//     } catch (error) {
-//       if (error instanceof Error) {
-//         const firebaseError = error as AuthError;
-//         return rejectWithValue(handleFirebaseError(firebaseError));
-//       }
-//       return rejectWithValue("An unexpected error occurred.");
-//     }
-//   }
-// );
-
-
 export const loginUser = createAsyncThunk(
   "user/login",
   async (credentials: LoginUserPayload, { rejectWithValue }) => {
@@ -160,6 +124,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       await signOut(auth);
+      await AsyncStorage.removeItem("user");
       return null;
     } catch (error) {
       return rejectWithValue("Failed to logout. Please try again.");
@@ -202,27 +167,16 @@ export const updateUserDetails = createAsyncThunk(
 
 export const fetchUserData = createAsyncThunk(
   "user/fetchUserData",
-  async (_, { rejectWithValue }) => {
+  async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        return rejectWithValue("No authenticated user found.");
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        return JSON.parse(storedUser);
       }
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (!userDoc.exists()) {
-        return rejectWithValue("User data not found in Firestore.");
-      }
-
-      const userData = userDoc.data();
-      return {
-        uid: user.uid,
-        email: user.email || "",
-        firstName: userData.firstName || "",
-        lastName: userData.lastName || "",
-        mobileNo: userData.mobileNo || "",
-      };
+      return null;
     } catch (error) {
-      return rejectWithValue("Failed to fetch user data.");
+      console.error("Failed to fetch user data:", error);
+      return null;
     }
   }
 );

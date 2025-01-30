@@ -90,6 +90,34 @@ const PageStyles = StyleSheet.create({
     color: "#3182ce",
     fontWeight: "600",
   },
+
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    resizeMode: "cover",
+    marginTop: 8,
+  },
+  imagePickerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "white",
+    padding: 5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  imagePickerText: {
+    marginLeft: 10,
+    fontSize: 15,
+    marginTop: 5,
+    color: "#3182ce",
+    fontWeight: "500",
+  },
+  imageContent: {
+    display: "flex",
+    flexDirection: "row",
+  },
 });
 
 export default PageStyles;

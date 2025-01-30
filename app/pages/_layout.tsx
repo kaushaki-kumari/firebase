@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Register from "./Register";
 import TabNavigator from "../(tabs)/_layout";
 import Login from "./Login";
-import { ActivityIndicator, View, Platform } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 
 const Stack = createStackNavigator();
 
@@ -31,15 +31,17 @@ const AppNavigator = () => {
       </View>
     );
   }
-
-  const initialRoute = Platform.OS === "web" ? (isLoggedIn ? "main" : "login") : "login";
+  const initialRoute = isLoggedIn ? "main" : "login";
 
   return (
     <Stack.Navigator initialRouteName={initialRoute}>
       <Stack.Screen
         name="register"
         component={Register}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          cardStyle: { flex: 1 }, 
+        }}
       />
       <Stack.Screen
         name="login"
