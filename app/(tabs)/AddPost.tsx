@@ -12,7 +12,6 @@ import {
   Image,
   Platform,
 } from "react-native";
-import { WebView } from "react-native-webview";
 import { useDispatch, useSelector } from "react-redux";
 import QuillEditor, { QuillToolbar } from "react-native-cn-quill";
 import { addPost } from "../reducer/PostSlice";
@@ -25,9 +24,7 @@ import { RegisterScreenNavigationProp } from "../types/types";
 import Toast from "toastify-react-native";
 
 const AddPost = () => {
-  const webViewRef = useRef<WebView | null>(null);
   const _editor = createRef<QuillEditor>();
-
   const [formData, setFormData] = useState({
     title: "",
     photo: "",
@@ -39,34 +36,7 @@ const AddPost = () => {
   const navigation = useNavigation<RegisterScreenNavigationProp>();
   const { loading } = useSelector((state: any) => state.posts);
 
-  // const resetEditor = () => {
-  //   // if (_editor.current) {
-
-  //   //   _editor.current.setContents([{ insert: '\n' }]);
-  //   //   setDescription("");
-  //   // }
-  //   // if (webViewRef.current) {
-  //   //   webViewRef.current.injectJavaScript(
-  //   //     `CKEDITOR.instances.editor.setData('');`
-  //   //   );
-  //   // }
-  //   // if (_editor.current) {
-  //   //   // Reset the Quill editor's content to just a new line
-  //   //   console.log('1111111111111111111111r')
-  //   //   _editor.current.setContents([{ insert: '\n' }]);
-  //   // }
-  //   if (webViewRef.current) {
-  //     webViewRef.current.injectJavaScript(`
-  //       if (CKEDITOR.instances.editor) {
-  //         CKEDITOR.instances.editor.setData('');
-  //       }
-  //     `);
-  //     setDescription("");  // Clear the description in state as well
-  //   }
-  // };
-
   const resetEditor = () => {
-    // console.log(_editor);
     if (_editor.current) {
       console.log("Resetting editor...");
       _editor.current.setContents([{ insert: "\n" }]);
@@ -122,7 +92,6 @@ const AddPost = () => {
         navigation.navigate("home");
         Toast.info("Post added successfully!");
       })
-
       .catch((error: string) => setErrorMessage(error));
     resetEditor();
   };
