@@ -15,7 +15,7 @@ const PageStyles = StyleSheet.create({
     fontSize: 30,
     fontWeight: "bold",
     color: "#2d3748",
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: "center",
   },
   titleClr: {
