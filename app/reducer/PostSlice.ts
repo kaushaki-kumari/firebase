@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { addDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "../config/firbase.config";
 
 interface Post {
@@ -7,22 +7,18 @@ interface Post {
   photo: string;
   slug: string;
   description: string;
-  updatedAt: string;
-  id: string;
 }
 
 interface PostState {
   loading: boolean;
   posts: Post[];
   error: string | null;
-  lastVisible: any;
 }
 
 const initialState: PostState = {
   loading: false,
   posts: [],
   error: null,
-  lastVisible: null,
 };
 
 export const addPost = createAsyncThunk(
@@ -43,26 +39,6 @@ export const addPost = createAsyncThunk(
   }
 );
 
-export const fetchPosts = createAsyncThunk(
-  'posts/fetchPosts',
-  async () => {
-    const postsSnapshot = await getDocs(collection(db, 'posts'));
-    const posts = postsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        title: data.title,
-        photo: data.photo,
-        slug: data.slug,
-        description: data.description,
-        updatedAt: data.updatedAt?.toDate().toISOString(), 
-        taggedUsers: data.taggedUsers || [],
-      };
-    });
-    return posts;
-  }
-);
-
 const postSlice = createSlice({
   name: 'posts',
   initialState,
@@ -77,17 +53,6 @@ const postSlice = createSlice({
         state.posts.push(action.payload); 
       })
       .addCase(addPost.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-      .addCase(fetchPosts.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.posts = action.payload; 
-      })
-      .addCase(fetchPosts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
