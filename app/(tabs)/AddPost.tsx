@@ -1,4 +1,4 @@
-import React, { useRef, useState, createRef } from "react";
+import React, { useState, createRef } from "react";
 import {
   View,
   Text,
@@ -20,8 +20,9 @@ import { AppDispatch } from "../store";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "expo-router";
-import { RegisterScreenNavigationProp } from "../types/types";
+import { RegisterScreenNavigationProp, UserTag } from "../types/types";
 import Toast from "toastify-react-native";
+import TagUsers from "../components/TagUsers";
 
 const AddPost = () => {
   const _editor = createRef<QuillEditor>();
@@ -31,6 +32,7 @@ const AddPost = () => {
     slug: "",
   });
   const [description, setDescription] = useState("");
+  const [taggedUsers, setTaggedUsers] = useState<UserTag[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const dispatch = useDispatch<AppDispatch>();
   const navigation = useNavigation<RegisterScreenNavigationProp>();
@@ -38,10 +40,8 @@ const AddPost = () => {
 
   const resetEditor = () => {
     if (_editor.current) {
-      console.log("Resetting editor...");
       _editor.current.setContents([{ insert: "\n" }]);
     }
-    console.log("Resetting description state...");
     setDescription("");
   };
 
@@ -81,7 +81,13 @@ const AddPost = () => {
       return;
     }
     const generatedSlug = generateSlug(formData.title, formData.slug);
-    const postData = { ...formData, slug: generatedSlug, description };
+    const postData = {
+      ...formData,
+      slug: generatedSlug,
+      description,
+      taggedUsers: taggedUsers,
+      updatedAt: new Date().toISOString(),
+    };
 
     dispatch(addPost(postData))
       .unwrap()
@@ -89,12 +95,14 @@ const AddPost = () => {
         setErrorMessage("");
         setFormData({ title: "", photo: "", slug: "" });
         setDescription("");
+        setTaggedUsers([]);
         navigation.navigate("home");
         Toast.info("Post added successfully!");
       })
       .catch((error: string) => setErrorMessage(error));
     resetEditor();
   };
+
   const generateSlug = (title: string, slugFromFormData: string) => {
     const slugBase = title
       .toLowerCase()
@@ -161,6 +169,10 @@ const AddPost = () => {
             onChangeText={(text) => setFormData({ ...formData, slug: text })}
           />
         </View>
+        <TagUsers
+          taggedUsers={taggedUsers}
+          setTaggedUsers={setTaggedUsers}
+        />
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Description</Text>
           <View style={styles.webviewContainer}>
@@ -205,6 +217,7 @@ const AddPost = () => {
             <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
           ) : null}
         </View>
+       
       </ScrollView>
     </ImageBackground>
   );

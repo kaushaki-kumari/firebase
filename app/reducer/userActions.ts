@@ -7,9 +7,10 @@ import {
   AuthErrorCodes,
   UserCredential,
 } from "firebase/auth";
-import { setDoc, doc, getDoc } from "firebase/firestore";
+import { setDoc, doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../config/firbase.config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { UserDetails } from "../reducer/userSlice";
 
 interface RegisterUserPayload {
   firstName: string;
@@ -177,6 +178,25 @@ export const fetchUserData = createAsyncThunk(
     } catch (error) {
       console.error("Failed to fetch user data:", error);
       return null;
+    }
+  }
+);
+
+export const fetchUsers = createAsyncThunk(
+  "user/fetchUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "users"));
+      const userList: UserDetails[] = querySnapshot.docs.map((doc) => ({
+        uid: doc.id,
+        email: doc.data().email,
+        firstName: doc.data().firstName,
+        lastName: doc.data().lastName,
+        mobileNo: doc.data().mobileNo,
+      }));
+      return userList;
+    } catch (error) {
+      return rejectWithValue("Error fetching users from Firestore.");
     }
   }
 );

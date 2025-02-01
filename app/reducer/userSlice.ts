@@ -5,9 +5,10 @@ import {
   logoutUser,
   updateUserDetails,
   fetchUserData,
+  fetchUsers,
 } from "./userActions";
 
-interface UserDetails {
+export interface UserDetails {
   uid: string;
   email: string | null;
   firstName: string | null;
@@ -16,6 +17,7 @@ interface UserDetails {
 }
 
 interface UserState {
+  users: UserDetails[];
   user: UserDetails | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   loading: boolean;
@@ -23,6 +25,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
+  users: [],
   user: null,
   status: "idle",
   loading: false,
@@ -121,6 +124,19 @@ const userSlice = createSlice({
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
+      })
+      .addCase(fetchUsers.pending, (state) => {
+        state.status = "loading";
+        state.errorMessage = null;
+      })
+      .addCase(fetchUsers.fulfilled, (state, action) => {
+        state.users = action.payload;
+        state.status = "succeeded";
+        state.errorMessage = null;
+      })
+      .addCase(fetchUsers.rejected, (state, action) => {
+        state.status = "failed";
+        state.errorMessage = action.payload as string;
       });
   },
 });
