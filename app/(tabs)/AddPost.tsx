@@ -169,6 +169,10 @@ const AddPost = () => {
             onChangeText={(text) => setFormData({ ...formData, slug: text })}
           />
         </View>
+        <TagUsers
+          taggedUsers={taggedUsers}
+          setTaggedUsers={setTaggedUsers}
+        />
         <View style={PageStyles.inputContainer}>
           <Text style={PageStyles.label}>Description</Text>
           <View style={styles.webviewContainer}>
@@ -213,10 +217,7 @@ const AddPost = () => {
             <Text style={PageStyles.errorMessage}>{errorMessage}</Text>
           ) : null}
         </View>
-        <TagUsers
-          taggedUsers={taggedUsers}
-          setTaggedUsers={setTaggedUsers}
-        />
+       
       </ScrollView>
     </ImageBackground>
   );
