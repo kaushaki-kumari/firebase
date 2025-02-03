@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,21 +8,24 @@ import {
   StyleSheet,
   ImageBackground,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPosts } from "../reducer/PostSlice";
 import { AppDispatch } from "../store";
 import PageStyles from "../styles/PageStyles";
+import RenderHTML from "react-native-render-html";
+import { useWindowDimensions } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
 
-interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-}
 const PostList = () => {
+  const { width } = useWindowDimensions();
   const dispatch = useDispatch<AppDispatch>();
   const { posts, status, errorMessage, lastDocId, hasMore, loadingMore } =
     useSelector((state: any) => state.posts);
+  const [expandedComments, setExpandedComments] = useState<{
+    [key: string]: boolean;
+  }>({});
 
   useEffect(() => {
     dispatch(fetchPosts(null));
@@ -34,31 +37,65 @@ const PostList = () => {
     }
   };
 
+  const toggleComments = (postId: string) => {
+    setExpandedComments(prevState => ({
+      ...prevState,
+      [postId]: !prevState[postId]
+    }));
+  };
+
+
   const renderItem = ({ item }: { item: any }) => {
     const postImageUrl =
-    Platform.OS === "web"
-      ? "https://mnlht.com/wp-content/uploads/2017/06/no_image_placeholder.png"
-      : item.photo;
+      Platform.OS === "web"
+        ? "https://mnlht.com/wp-content/uploads/2017/06/no_image_placeholder.png"
+        : item.photo;
+    const formattedDate = new Date(item.createdAt).toLocaleString();
     return (
       <View style={styles.postContainer}>
-        <Text style={styles.title}>{item.title}</Text>
+        <View style={styles.userContainer}>
+          <FontAwesome
+            name="user-circle"
+            size={24}
+            color="#555"
+            style={styles.userIcon}
+          />
+          <Text style={styles.userName}>
+            {/* {item.createdBy
+              ? `${item.createdBy.firstName} ${item.createdBy.lastName}`
+              : "Unknown User"}{" "} */}
+            {formattedDate}
+          </Text>
+          
+        </View>
         {/* {item.photo && (
           <Image source={{ uri: item.photo }} style={styles.image} />
         )} */}
-         {postImageUrl && (
+        {postImageUrl && (
           <Image source={{ uri: postImageUrl }} style={styles.image} />
         )}
-        <Text style={styles.description}>{item.description}</Text>
+        <Text style={styles.title}>{item.title}</Text>
+        <RenderHTML contentWidth={width} source={{ html: item.description }} />
         {item.taggedUsers && item.taggedUsers.length > 0 && (
-          <View>
-            <Text style={styles.taggedUsersTitle}>Tagged Users:</Text>
-            {item.taggedUsers.map((user: User, index: number) => (
-              <View key={user.id || index}>
-                <Text style={styles.userName}>
-                  {user.firstName} {user.lastName}
-                </Text>
-              </View>
-            ))}
+          <Text style={styles.taggedUsers}>
+            Tagged:{" "}
+            {item.taggedUsers
+              .map((user: any) => `@${user.firstName} ${user.lastName}`)
+              .join(", ")}
+          </Text>
+        )}
+        <TouchableOpacity onPress={() => toggleComments(item.id)}>
+          <FontAwesome
+            name="comment"
+            size={20}
+            color="#555"
+            style={styles.commentIcon}
+          />
+        </TouchableOpacity>
+        {expandedComments[item.id] && (
+          <View style={styles.commentSection}>
+            <Text style={styles.commentTitle}>Comments</Text>
+            <Text style={styles.commentPlaceholder}>No comments yet.</Text>
           </View>
         )}
       </View>
@@ -130,6 +167,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#333",
+    marginTop: 10,
   },
   image: {
     width: "100%",
@@ -137,16 +175,23 @@ const styles = StyleSheet.create({
     marginTop: 5,
     borderRadius: 5,
   },
-  description: {
-    marginTop: 5,
+  // description: {
+  //   marginTop: 5,
+  //   fontSize: 14,
+  //   color: "#555",
+  // },
+  taggedUsers: {
+    // marginTop: 10,
     fontSize: 14,
-    color: "#555",
+    color: "#007AFF",
   },
-  taggedUsersTitle: {
-    marginTop: 10,
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
+  userContainer: {
+    flexDirection: "row",
+    justifyContent:'space-between',
+    // marginBottom: 10,
+  },
+  userIcon: {
+    marginRight: 10,
   },
   userName: {
     marginTop: 8,
@@ -168,6 +213,24 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "center",
     justifyContent: "center",
+  },
+  commentIcon: {
+    marginTop: 10,
+  },
+  commentSection: {
+    marginTop: 5,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+  },
+  commentTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  commentPlaceholder: {
+    fontSize: 14,
+    color: "#777",
   },
 });
 

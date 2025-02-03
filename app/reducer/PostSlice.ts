@@ -42,6 +42,8 @@ const initialState: PostState = {
   loadingMore: false,
 };
 const POSTS_PER_PAGE = 10;
+console.log(auth.currentUser); 
+
 
 export const addPost = createAsyncThunk(
   "posts/addPost",
@@ -52,6 +54,7 @@ export const addPost = createAsyncThunk(
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
         updatedBy: auth.currentUser?.uid || "unknown",
+        
       });
 
       return formData;
