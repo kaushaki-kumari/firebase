@@ -22,6 +22,7 @@ interface Post {
   description: string;
   createdAt?: string;
   updatedAt?: string;
+  updatedBy?: string; 
 }
 
 interface PostState {
@@ -53,10 +54,10 @@ export const addPost = createAsyncThunk(
         ...formData,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        updatedBy: auth.currentUser?.uid || "unknown",
+        updatedBy: formData.updatedBy,
         
       });
-
+      console.log(formData)
       return formData;
     } catch (error) {
       return thunkAPI.rejectWithValue(
