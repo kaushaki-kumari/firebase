@@ -120,6 +120,7 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+console.log(auth.currentUser); 
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { rejectWithValue }) => {
