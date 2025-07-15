@@ -23,8 +23,12 @@ import { useNavigation } from "expo-router";
 import { RegisterScreenNavigationProp, UserTag } from "../types/types";
 import Toast from "toastify-react-native";
 import TagUsers from "../components/TagUsers";
+import { auth } from "../config/firbase.config";
 
 const AddPost = () => {
+
+console.log('auth111111', auth.currentUser)
+console.log("auth state", auth);
   const _editor = createRef<QuillEditor>();
   const [formData, setFormData] = useState({
     title: "",
